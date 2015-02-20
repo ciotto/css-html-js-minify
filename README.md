@@ -28,7 +28,10 @@ StdIn to StdOut is deprecated since may fail with unicode characters.
 
 - Takes a full path to anything, a file or a folder, then parse, optimize and compress for Production.
 - If full path is a folder with multiple files it will use Async Multiprocessing.
-- Pretty-Printed colored Logging to StdOut and Log file, Smooth CPU usage and sets its own Process Name.
+- Pretty-Printed colored Logging to Standard Output and Log File on OS Temporary Folder.
+- Set its own Process name and show up on Process lists.
+- Full Unicode/UTF-8 support.
+- Smooth CPU usage.
 - `*.css` files are saved as `*.min.css`, `*.js` are saved as `*.min.js`, `*.htm` are saved as `*.html`
 
 
