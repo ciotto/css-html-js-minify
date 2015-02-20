@@ -151,8 +151,7 @@ EXTENDED_NAMED_COLORS = {
 def remove_comments(css):
     """Remove all CSS comment blocks."""
     log.debug("Removing all Comments.")
-    iemac = False
-    preserve = False
+    iemac, preserve = False, False
     comment_start = css.find("/*")
     while comment_start >= 0:
         # Preserve comments that look like `/*!...*/`.
@@ -298,8 +297,7 @@ def condense_semicolons(css):
 def wrap_css_lines(css, line_length):
     """Wrap the lines of the given CSS to an approximate length."""
     log.debug("Wrapping lines to ~{} max line lenght.".format(line_length))
-    lines = []
-    line_start = 0
+    lines, line_start = [], 0
     for i, char in enumerate(css):
         # Its safe to break after } characters.
         if char == '}' and (i - line_start >= line_length):
@@ -478,21 +476,16 @@ class JavascriptMinify(object):
         """Minify Javascript using StringIO."""
         if instream and outstream:
             self.ins, self.outs = instream, outstream
-        write = self.outs.write
-        read = self.ins.read
+        write, read = self.outs.write, self.ins.read
         space_strings = ("abcdefghijklmnopqrstuvwxyz"
                          "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$\\")
         starters, enders = '{[(+-', '}])+-"\''
         newlinestart_strings = starters + space_strings
         newlineend_strings = enders + space_strings
-        do_newline = False
-        do_space = False
-        doing_single_comment = False
-        previous_before_comment = ''
-        doing_multi_comment = False
-        in_re = False
-        in_quote = ''
-        quote_buf = []
+        do_newline, do_space = False, False
+        doing_single_comment, doing_multi_comment = False, False
+        previous_before_comment, in_quote = '', ''
+        in_re, quote_buf = False, []
         previous = read(1)
         next1 = read(1)
         if previous == '/':
@@ -696,7 +689,7 @@ def main():
     # Parse command line arguments.
     parser = ArgumentParser(description=__doc__, epilog="""CSS-HTML-JS-Minify:
     Takes a file or folder full path string and process all CSS/HTML/JS found.
-    If argument is not a file or folder it will fail and raise errors.
+    If argument is not a file or folder it will fail. This does Not Obfuscate.
     StdIn to StdOut is deprecated since may fail with unicode characters.""")
     parser.add_argument('--version', action='version', version=__version__)
     parser.add_argument('fullpath', metavar='fullpath', type=str,
