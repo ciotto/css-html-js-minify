@@ -31,6 +31,9 @@ StdIn to StdOut is deprecated since may fail with unicode characters.
 - Uses Pretty-Printed colored Logging to StdOut and Log file, Smooth CPU usage and Sets its own Process Name.
 - `*.css` files are saved as `*.min.css`, `*.js` files are saved as `*.min.js`, `*.htm` files are saved as `*.html`
 
+
+# Usage:
+
 ```bash
 css-html-js-minify.py file.htm
 
