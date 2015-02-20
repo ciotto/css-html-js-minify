@@ -4,7 +4,7 @@
 
 
 ```bash
-juan@z:~/$ python css-html-js-minify.py --help
+css-html-js-minify.py --help
 
 usage: css-html-js-minify.py [-h] [--version] [-w WRAP] [--quiet] fullpath
 
