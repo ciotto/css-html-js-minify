@@ -700,7 +700,7 @@ def main():
     StdIn to StdOut is deprecated since may fail with unicode characters.""")
     parser.add_argument('--version', action='version', version=__version__)
     parser.add_argument('fullpath', metavar='fullpath', type=str,
-                        help='Full path to local CSS file or folder with CSS.')
+                        help='Full path to local file or folder.')
     parser.add_argument('-w', '--wrap', type=int,
                         help="Wrap Output to N chars per line, CSS Only.")
     parser.add_argument('--quiet', action='store_true',
