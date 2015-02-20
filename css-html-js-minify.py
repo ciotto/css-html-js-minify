@@ -16,6 +16,7 @@ from copy import copy
 from ctypes import byref, cdll, create_string_buffer
 from multiprocessing import cpu_count, Pool
 from tempfile import gettempdir
+from datetime import datetime
 
 try:
     from urllib import request
@@ -36,6 +37,7 @@ __source__ = ('https://raw.githubusercontent.com/juancarlospaco/'
               'css-html-js-minify/master/css-html-js-minify.py')
 
 
+start_time = datetime.now()
 # 'Color Name String': (R, G, B)
 EXTENDED_NAMED_COLORS = {
     'azure': (240, 255, 255),
@@ -728,12 +730,15 @@ def main():
     # Work based on if argument is file or folder, folder is slower.
     if os.path.isfile(args.fullpath) and args.fullpath.endswith(".css"):
         log.info("Target is a CSS File.")
+        files_processed = 1
         process_single_css_file(args.fullpath, args.wrap)
     elif os.path.isfile(args.fullpath) and args.fullpath.endswith(".htm"):
         log.info("Target is a HTML File.")
+        files_processed = 1
         process_single_html_file(args.fullpath)
     elif os.path.isfile(args.fullpath) and args.fullpath.endswith(".js"):
         log.info("Target is a JS File.")
+        files_processed = 1
         process_single_js_file(args.fullpath)
     elif os.path.isdir(args.fullpath):
         log.info("Target is a Folder with CSS, HTML, JS.")
@@ -741,6 +746,7 @@ def main():
         list_of_files = walkdir_to_filelist(args.fullpath,
                                             (".css", ".js", ".htm"),
                                             (".min.css", ".min.js", ".html"))
+        files_processed = len(list_of_files)
         pool = Pool(cpu_count())  # Multiprocessing Async
         pool.map_async(process_multiple_files, list_of_files)
         pool.close()
@@ -748,6 +754,8 @@ def main():
     else:
         log.critical("File or folder not found,or cant be read,or I/O Error.")
         sys.exit(1)
+    log.info('Total Files Processed: {}.'.format(files_processed))
+    log.info('Total Processing Time: {}.'.format(datetime.now() - start_time))
 
 
 if __name__ in '__main__':
