@@ -16,7 +16,7 @@ positional arguments:
 
 optional arguments:
   -h, --help            show this help message and exit
-  --version             show program's version number and exit
+  --version             show programs version number and exit
   -w WRAP, --wrap WRAP  Wrap Output to N chars per line, CSS Only.
   --quiet               Quiet, force disable all Logging.
 
