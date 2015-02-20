@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 
 
-"""CSS-HTML-JS-Minify - Python port of the YUI CSS compressor."""
+"""CSS-HTML-JS-Minify -
+StandAlone Async single-file cross-platform no-dependencies
+Unicode-ready Python3-ready Minifier for the Web."""
 
 
 import logging as log
