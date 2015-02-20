@@ -12,7 +12,7 @@ CSS-HTML-JS-Minify - StandAlone Async single-file cross-platform
 no-dependencies Unicode-ready Python3-ready Minifier for the Web.
 
 positional arguments:
-  fullpath              Full path to local CSS file or folder with CSS.
+  fullpath              Full path to local file or folder.
 
 optional arguments:
   -h, --help            show this help message and exit
