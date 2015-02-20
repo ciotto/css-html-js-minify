@@ -52,12 +52,6 @@ css-html-js-minify.py /project/static/
 ```
 
 
-# Try it !:
-
-```
-wget -O - https://raw.githubusercontent.com/juancarlospaco/css-html-js-minify/master/css-html-js-minify.py | python3
-```
-
 # Install permanently on the system:
 
 ```
