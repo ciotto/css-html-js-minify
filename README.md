@@ -19,10 +19,11 @@ optional arguments:
   --version             show programs version number and exit
   -w WRAP, --wrap WRAP  Wrap Output to N chars per line, CSS Only.
   --quiet               Quiet, force disable all Logging.
+  --checkupdates        Check for Updates from Internet.
 
 CSS-HTML-JS-Minify: 
 Takes a file or folder full path string and process all CSS/HTML/JS found. 
-If argument is not a file or folder it will fail and raise errors. 
+If argument is not a file or folder it will fail. This does Not Obfuscate.
 StdIn to StdOut is deprecated since may fail with unicode characters.
 ```
 
@@ -31,10 +32,11 @@ StdIn to StdOut is deprecated since may fail with unicode characters.
 - Pretty-Printed colored Logging to Standard Output and Log File on OS Temporary Folder.
 - No Dependencies at all, just needs Python Standard Built-in Libs.
 - Set its own Process name and show up on Process lists.
+- Can check for updates for itself.
 - Full Unicode/UTF-8 support.
+- Do NOT obfuscates code.
 - Smooth CPU usage.
 - `*.css` files are saved as `*.min.css`, `*.js` are saved as `*.min.js`, `*.htm` are saved as `*.html`
-- Do NOT obfuscates code.
 
 
 # Usage:
