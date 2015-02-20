@@ -34,6 +34,7 @@ StdIn to StdOut is deprecated since may fail with unicode characters.
 - Full Unicode/UTF-8 support.
 - Smooth CPU usage.
 - `*.css` files are saved as `*.min.css`, `*.js` are saved as `*.min.js`, `*.htm` are saved as `*.html`
+- Do NOT obfuscates code.
 
 
 # Usage:
