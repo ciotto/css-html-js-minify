@@ -18,6 +18,10 @@ from multiprocessing import cpu_count, Pool
 from tempfile import gettempdir
 
 try:
+    from urllib import request
+except ImportError:
+    request = None
+try:
     from StringIO import StringIO  # pure-Python StringIO supports unicode.
 except ImportError:
     from io import StringIO  # lint:ok
@@ -28,6 +32,8 @@ __license__ = 'GPLv3+ LGPLv3+'
 __author__ = 'Juan Carlos'
 __email__ = 'juancarlospaco@gmail.com'
 __url__ = 'https://github.com/juancarlospaco/css-html-js-minify'
+__source__ = ('https://raw.githubusercontent.com/juancarlospaco/'
+              'css-html-js-minify/master/css-html-js-minify.py')
 
 
 # 'Color Name String': (R, G, B)
@@ -640,6 +646,19 @@ def process_single_js_file(js_file_path):
         output_file.write(minified_js)
 
 
+def check_for_updates():
+    """Method to check for updates from Git repo versus this version."""
+    if not request:
+        log.critical("Feature only available on Python 3.x, command ignored.")
+        return
+    this_version = str(open(__file__).read())
+    last_version = str(request.urlopen(__source__).read().decode("utf8"))
+    if this_version != last_version:
+        log.warning("Theres new Version available!,Download update from Web.")
+    else:
+        log.info("No new updates!,You have the lastest version of this app.")
+
+
 def main():
     """Main Loop."""
     if not sys.platform.startswith("win") and sys.stderr.isatty():
@@ -698,7 +717,11 @@ def main():
                         help="Wrap Output to N chars per line, CSS Only.")
     parser.add_argument('--quiet', action='store_true',
                         help="Quiet, force disable all Logging.")
+    parser.add_argument('--checkupdates', action='store_true',
+                        help="Check for Updates from Internet.")
     args = parser.parse_args()
+    if args.checkupdates:
+        check_for_updates()
     if args.quiet:
         log.disable(log.CRITICAL)
     log.info(__doc__)
