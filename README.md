@@ -61,6 +61,23 @@ css-html-js-minify
 ```
 
 
+# Why?:
+
+- **Why another Compressor ?**, theres lots of Compressor for Web files outthere!, *...or maybe not ?*.
+- Lots work inside DJango/Flask only, or other Frameworks of PHP/Java/Ruby, or can Not process whole folders.
+
+| Name | Reason |
+| ---- | ------ |
+| [YUI-Compressor](www.yuiblog.com/blog/2012/10/16/state-of-yui-compressor) | Deprecated, Needs Java, Dead since ~2012, No HTML Minification, Complex to Install |
+| [UglifyJS](https://github.com/mishoo/UglifyJS2) | Needs NodeJS, No HTML/CSS Minification, Cant process whole folders |
+| [Slimmer](https://pypi.python.org/pypi/slimmer) | Python2 Only, No Unicode/UTF-8 Support, Dead since ~2009 |
+| [CSSMin](https://pypi.python.org/pypi/cssmin) | No Unicode/UTF-8 Support, Dead since ~2013, No HTML/JS Minification, Cant process whole folders |
+| [django-cssmin](https://github.com/zacharyvoase/django-cssmin) | Uses CSSMin which is Dead, DJango only, No HTML/JS Minification |
+| [SlimIt](https://pypi.python.org/pypi/slimit) | JS Only, to use as RunTime Module, Dead sincec ~2013, Cant process whole folders |
+| [JSMin](https://pypi.python.org/pypi/jsmin) | JS Only, Cant process whole folders |
+| All On-Line Minifiers | Cant process whole folders, Slow, No Unicode/UTF-8 Support usually |
+
+
 # Requisites:
 
 - [Python 3.x](https://www.python.org "Python Homepage") *(or Python 2.x)*
