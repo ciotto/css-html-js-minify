@@ -407,7 +407,8 @@ def cssmin(css, wrap=None):
 def condense_html_whitespace(html):
     """Condense HTML."""
     log.debug("Removing unnecessary HTML White Spaces.")
-    return re.sub(r'\s{2,}|[\r\n]', '', html).strip()
+    is_ok = not "<textarea" in html.lower() and not "<pre" in html.lower()
+    return re.sub(r'\s{2,}|[\r\n]', '', html).strip() if is_ok else html
 
 
 def condense_style(html):
