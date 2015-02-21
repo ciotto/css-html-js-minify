@@ -63,8 +63,8 @@ css-html-js-minify
 
 # Why?:
 
-- **Why another Compressor ?**, theres lots of Compressor for Web files outthere!, *...or maybe not ?*.
-- Lots work inside DJango/Flask only, or other Frameworks of PHP/Java/Ruby, or can Not process whole folders.
+- **Why another Compressor ?**, theres lots of Compressor for Web files outthere!; *Or maybe not ?*.
+- Lots work inside DJango/Flask only, or Frameworks of PHP/Java/Ruby, or can Not process whole folders.
 
 | Name | Reason |
 | ---- | ------ |
