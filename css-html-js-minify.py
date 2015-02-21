@@ -630,8 +630,15 @@ def process_multiple_files(file_path):
 def process_single_css_file(css_file_path, wrap_to=None):
     """Process a single CSS file."""
     log.info("Processing CSS file: {}".format(css_file_path))
-    with open(css_file_path) as css_file:
-        minified_css = cssmin(css_file.read(), wrap=wrap_to)
+    try:  # Python3
+        with open(css_file_path, encoding="utf-8-sig") as css_file:
+            minified_css = cssmin(css_file.read(), wrap=wrap_to)
+    except:  # Python2
+        with open(css_file_path) as css_file:
+            minified_css = cssmin(css_file.read(), wrap=wrap_to)
+    if args.timestamp:
+        taim = "/* {} */ ".format(datetime.now().isoformat()[:-7].lower())
+        minified_css = taim + minified_css
     with open(css_file_path.replace(".css", ".min.css"), "w") as output_file:
         output_file.write(minified_css)
 
@@ -639,8 +646,12 @@ def process_single_css_file(css_file_path, wrap_to=None):
 def process_single_html_file(html_file_path):
     """Process a single HTML file."""
     log.info("Processing HTML file: {}".format(html_file_path))
-    with open(html_file_path) as html_file:
-        minified_html = htmlmin(html_file.read())
+    try:  # Python3
+        with open(html_file_path, encoding="utf-8-sig") as html_file:
+            minified_html = htmlmin(html_file.read())
+    except:  # Python2
+        with open(html_file_path) as html_file:
+            minified_html = htmlmin(html_file.read())
     with open(html_file_path.replace(".htm", ".html"), "w") as output_file:
         output_file.write(minified_html)
 
@@ -648,8 +659,15 @@ def process_single_html_file(html_file_path):
 def process_single_js_file(js_file_path):
     """Process a single JS file."""
     log.info("Processing JS file: {}".format(js_file_path))
-    with open(js_file_path) as js_file:
-        minified_js = jsmin(js_file.read())
+    try:  # Python3
+        with open(js_file_path, encoding="utf-8-sig") as js_file:
+            minified_js = jsmin(js_file.read())
+    except:  # Python2
+        with open(js_file_path) as js_file:
+            minified_js = jsmin(js_file.read())
+    if args.timestamp:
+        taim = "/* {} */ ".format(datetime.now().isoformat()[:-7].lower())
+        minified_js = taim + minified_js
     with open(js_file_path.replace(".js", ".min.js"), "w") as output_file:
         output_file.write(minified_js)
 
@@ -721,12 +739,15 @@ def main():
     parser.add_argument('--version', action='version', version=__version__)
     parser.add_argument('fullpath', metavar='fullpath', type=str,
                         help='Full path to local file or folder.')
-    parser.add_argument('-w', '--wrap', type=int,
+    parser.add_argument('--wrap', type=int,
                         help="Wrap Output to N chars per line, CSS Only.")
+    parser.add_argument('--timestamp', action='store_true',
+                        help="Add a Time Stamp on all CSS/JS output files.")
     parser.add_argument('--quiet', action='store_true',
                         help="Quiet, force disable all Logging.")
     parser.add_argument('--checkupdates', action='store_true',
                         help="Check for Updates from Internet.")
+    global args
     args = parser.parse_args()
     if args.checkupdates:
         check_for_updates()
