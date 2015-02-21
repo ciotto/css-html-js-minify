@@ -35,7 +35,6 @@ StdIn to StdOut is deprecated since may fail with unicode characters.
 - Set its own Process name and show up on Process lists.
 - Can check for updates for itself.
 - Full Unicode/UTF-8 support.
-- Do NOT obfuscates code.
 - Smooth CPU usage.
 - `*.css` files are saved as `*.min.css`, `*.js` are saved as `*.min.js`, `*.htm` are saved as `*.html`
 

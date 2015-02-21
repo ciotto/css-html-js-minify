@@ -517,6 +517,106 @@ def force_single_line_js(js):
     return ";".join(js.split("\n")) if len(js.split("\n")) > 1 else js.strip()
 
 
+# regular expressions to find and work with Javascript functions and variables
+function_start_regex = re.compile('(function[ \w+\s*]\(([^\)]*)\)\s*{)')
+function_start_regex = re.compile('(function(\s+\w+|)\s*\(([^\)]*)\)\s*{)')
+function_name_regex = re.compile('(function (\w+)\()')
+
+
+def _findFunctions(whole):
+    """Find function() on Javascript code."""
+    for res in function_start_regex.findall(whole):
+        function_start, function_name, params = res
+        params_split = [x.strip() for x in params.split(',')]
+        stack, code, core_code = 1, function_start, ''
+        start = whole.find(function_start) + len(code)
+        while stack > 0:
+            next_char = whole[start]
+            core_code += next_char
+            if next_char == '{':
+                stack += 1
+            elif next_char == '}':
+                stack -= 1
+            start += 1
+        yield (params, params_split, core_code[:-1], function_start)
+
+
+def slim_params(code):
+    """Compress params on Javascript code functions."""
+    old_functions, new_code = {}, code
+    for params, params_split, core, function_start in _findFunctions(code):
+        params_split_use = [x for x in params_split if len(x) > 1]
+        _param_regex = '|'.join([r'\b%s\b' % x for x in params_split_use])
+        param_regex, new_params = re.compile(_param_regex), {}
+        for i in range(len(params_split_use)):
+            new_params[params_split[i]] = '_{}'.format(i)
+
+        def replacer(match):
+            return new_params.get(match.group())
+
+        new_core, _params = param_regex.sub(replacer, core), []
+        for p in params_split:
+            _params.append(new_params.get(p, p))
+        new_function = function_start.replace(
+            params, ','.join(_params)) + new_core + '}'
+        old_function = function_start + core + '}'
+        old_functions[old_function] = new_function
+    regex = '|'.join([re.escape(x) for x in old_functions.keys()])
+
+    def replacer(match):
+        return old_functions.get(match.group())
+
+    return re.sub(regex, replacer, new_code)
+
+
+class NamesGenerator:
+
+    """Class to generate names for Javascript code function variables."""
+
+    def __init__(self):
+        """Init class, setup basic variables."""
+        self.i, self.pool = 0, list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+
+    def next(self):
+        """Work with next items."""
+        try:
+            e = self.pool[self.i]
+            self.i = self.i + 1
+        except IndexError:
+            if not hasattr(self, 'j'):
+                self.j = 0
+                self.pool.extend([x.lower() for x in self.pool])
+            try:
+                e = self.pool[self.i % len(self.pool)] + self.pool[self.j]
+                self.j = self.j + 1
+            except IndexError:
+                self.i += 1
+                self.j = 0
+                return self.next()
+        return '_{}'.format(e)
+
+
+def slim_func_names(js):
+    """Compress Javascript variable names inside functions."""
+    renamed_func, functions = [], function_name_regex.findall(js)
+    new_names_generator = NamesGenerator()
+    for whole_func, func_name in functions:
+        count = js.count(func_name)
+        if len(func_name) > 2 and count > 1:
+            new_name = new_names_generator.next()
+            if re.findall(r'\b%s\b' % re.escape(new_name), js):
+                continue
+            js = re.sub(r'\b%s\b' % re.escape(func_name), new_name, js)
+            renamed_func.append((func_name, new_name))
+    return js + ';'.join(['var {}={}'.format(x, y) for (x, y) in renamed_func])
+
+
+def slim(code):
+    """Compress variables and functions names."""
+    log.debug("Obfuscating Javascript variables names inside functions.")
+    return slim_func_names(slim_params(code))
+
+
 class JavascriptMinify(object):
 
     """Minify an input stream of Javascript, writing to an output stream."""
@@ -649,6 +749,8 @@ class JavascriptMinify(object):
 
 def walkdir_to_filelist(where, target, omit):
     """Perform full walk of where, gather full path of all files."""
+    log.debug("""Recursively Scanning {}, searching for {}, and ignoring {}.
+    """.format(where, target, omit))
     return tuple([os.path.join(root, f) for root, d, files in os.walk(where)
                   for f in files if not f.startswith('.')  # ignore hidden
                   and not f.endswith(omit)  # not process processed file
@@ -670,7 +772,9 @@ def prefixer_extensioner(file_path, old, new):
     """Take a file path and safely prepend a prefix and change extension.
 
     This is needed because filepath.replace('.foo', '.bar') sometimes may
-    replace '/folder.foo/file.foo' into '/folder.bar/file.bar' wrong!."""
+    replace '/folder.foo/file.foo' into '/folder.bar/file.bar' wrong!.
+    """
+    log.debug("Prepending Prefix to {}.".format(file_path))
     global args
     extension = os.path.splitext(file_path)[1].lower().replace(old, new)
     filenames = os.path.splitext(os.path.basename(file_path))[0]
@@ -717,10 +821,10 @@ def process_single_js_file(js_file_path):
     log.info("Processing JS file: {}".format(js_file_path))
     try:  # Python3
         with open(js_file_path, encoding="utf-8-sig") as js_file:
-            minified_js = jsmin(js_file.read())
+            minified_js = jsmin(slim(js_file.read()))
     except:  # Python2
         with open(js_file_path) as js_file:
-            minified_js = jsmin(js_file.read())
+            minified_js = jsmin(slim(js_file.read()))
     if args.timestamp:
         taim = "/* {} */ ".format(datetime.now().isoformat()[:-7].lower())
         minified_js = taim + minified_js
@@ -791,7 +895,7 @@ def main():
     # Parse command line arguments.
     parser = ArgumentParser(description=__doc__, epilog="""CSS-HTML-JS-Minify:
     Takes a file or folder full path string and process all CSS/HTML/JS found.
-    If argument is not a file or folder it will fail. This does Not Obfuscate.
+    If argument is not a file or folder it will fail.
     StdIn to StdOut is deprecated since may fail with unicode characters.""")
     parser.add_argument('--version', action='version', version=__version__)
     parser.add_argument('fullpath', metavar='fullpath', type=str,
