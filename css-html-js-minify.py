@@ -469,7 +469,13 @@ def jsmin(js):
     log.info("Compressing Javascript...")
     ins, outs = StringIO(js), StringIO()
     JavascriptMinify(ins, outs).minify()
-    return str(outs.getvalue()).strip()
+    return condense_semicolons(force_single_line_js(outs.getvalue()))
+
+
+def force_single_line_js(js):
+    """Force Javascript to a single line, even if need to add semicolon."""
+    log.debug("Forcing JS from {} to 1 Line.".format(len(js.split("\n"))))
+    return ";".join(js.split("\n")) if len(js.split("\n")) > 1 else js.strip()
 
 
 class JavascriptMinify(object):
