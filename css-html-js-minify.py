@@ -666,6 +666,20 @@ def process_multiple_files(file_path):
         process_single_html_file(file_path)
 
 
+def prefixer_extensioner(file_path, old, new):
+    """Take a file path and safely prepend a prefix and change extension.
+
+    This is needed because filepath.replace('.foo', '.bar') sometimes may
+    replace '/folder.foo/file.foo' into '/folder.bar/file.bar' wrong!."""
+    global args
+    extension = os.path.splitext(file_path)[1].lower().replace(old, new)
+    filenames = os.path.splitext(os.path.basename(file_path))[0]
+    filenames = args.prefix + filenames if args.prefix else filenames
+    dir_names = os.path.dirname(file_path)
+    file_path = os.path.join(dir_names, filenames + extension)
+    return file_path
+
+
 def process_single_css_file(css_file_path, wrap_to=None):
     """Process a single CSS file."""
     log.info("Processing CSS file: {}".format(css_file_path))
@@ -679,7 +693,8 @@ def process_single_css_file(css_file_path, wrap_to=None):
     if args.timestamp:
         taim = "/* {} */ ".format(datetime.now().isoformat()[:-7].lower())
         minified_css = taim + minified_css
-    with open(css_file_path.replace(".css", ".min.css"), "w") as output_file:
+    css_file_path = prefixer_extensioner(css_file_path, ".css", ".min.css")
+    with open(css_file_path, "w") as output_file:
         output_file.write(minified_css)
 
 
@@ -692,7 +707,8 @@ def process_single_html_file(html_file_path):
     except:  # Python2
         with open(html_file_path) as html_file:
             minified_html = htmlmin(html_file.read())
-    with open(html_file_path.replace(".htm", ".html"), "w") as output_file:
+    html_file_path = prefixer_extensioner(html_file_path, ".htm", ".html")
+    with open(html_file_path, "w") as output_file:
         output_file.write(minified_html)
 
 
@@ -708,7 +724,8 @@ def process_single_js_file(js_file_path):
     if args.timestamp:
         taim = "/* {} */ ".format(datetime.now().isoformat()[:-7].lower())
         minified_js = taim + minified_js
-    with open(js_file_path.replace(".js", ".min.js"), "w") as output_file:
+    js_file_path = prefixer_extensioner(js_file_path, ".js", ".min.js")
+    with open(js_file_path, "w") as output_file:
         output_file.write(minified_js)
 
 
@@ -781,19 +798,21 @@ def main():
                         help='Full path to local file or folder.')
     parser.add_argument('--wrap', type=int,
                         help="Wrap Output to N chars per line, CSS Only.")
+    parser.add_argument('--prefix', type=str,
+                        help="Prefix string to prepend on output filenames.")
     parser.add_argument('--timestamp', action='store_true',
                         help="Add a Time Stamp on all CSS/JS output files.")
     parser.add_argument('--quiet', action='store_true',
                         help="Quiet, force disable all Logging.")
     parser.add_argument('--checkupdates', action='store_true',
-                        help="Check for Updates from Internet.")
+                        help="Check for Updates from Internet while running.")
     global args
     args = parser.parse_args()
     if args.checkupdates:
         check_for_updates()
     if args.quiet:
         log.disable(log.CRITICAL)
-    log.info(__doc__)
+    log.info(__doc__ + __version__)
     # Work based on if argument is file or folder, folder is slower.
     if os.path.isfile(args.fullpath) and args.fullpath.endswith(".css"):
         log.info("Target is a CSS File.")
