@@ -406,9 +406,10 @@ def cssmin(css, wrap=None):
 
 def condense_html_whitespace(html):
     """Condense HTML."""
-    log.debug("Removing unnecessary HTML White Spaces.")
+    log.debug("Removing unnecessary HTML White Spaces and Empty New Lines.")
     is_ok = not "<textarea" in html.lower() and not "<pre" in html.lower()
-    return re.sub(r'\s{2,}|[\r\n]', '', html).strip() if is_ok else html
+    html = re.sub(r'>\s+<','><', html) if is_ok else html
+    return re.sub(r'\s{2,}|[\r\n]', '', html) if is_ok else html.strip()
 
 
 def condense_style(html):
@@ -446,7 +447,41 @@ def clean_unneeded_html_tags(html):
 def remove_html_comments(html):
     """Remove all HTML comments."""
     log.debug("Removing unnecessary HTML comments.")
-    return re.sub("<!--.*?-->", "", html)
+    html = re.compile(r'<!--[\w\s].*?-->', re.I).sub('', html)  # 1 line
+    return re.sub("<!--.*?-->", "", html)  # multi-line comments
+
+
+def unquote_html_attributes(html):
+    """Remove all HTML quotes on attibutes if possible."""
+    log.debug("Removing unnecessary Quotes on attributes of HTML tags.")
+    # cache all regular expressions on variables before we enter the for loop.
+    any_tag = re.compile(r"<\w.*?>", re.I|re.MULTILINE|re.DOTALL)
+    space = re.compile(r' \s+|\s +', re.MULTILINE)
+    space1 = re.compile(r'\w\s+\w', re.MULTILINE)
+    space2 = re.compile(r'"\s+>', re.MULTILINE)
+    space3 = re.compile(r"'\s+>", re.MULTILINE)
+    space4 = re.compile('"\s\s+\w+="|\'\s\s+\w+=\'|"\s\s+\w+=|\'\s\s+\w+=',
+                        re.MULTILINE)
+    space6 = re.compile(r"\d\s+>", re.MULTILINE)
+    quotes_in_tag = re.compile('([a-zA-Z]+)="([a-zA-Z0-9-_\.]+)"')
+    # iterate on a for loop cleaning stuff up on the html markup.
+    for tag in iter(any_tag.findall(html)):
+        # exceptions of comments and closing tags
+        if tag.startswith('<!') or tag.find('</') > -1:
+            continue
+        original = tag
+        # remove white space inside the tag itself
+        tag = space2.sub('">', tag)
+        tag = space3.sub("'>", tag)
+        for each in space1.findall(tag) + space6.findall(tag):
+            tag = tag.replace(each, space.sub(' ',each))
+        for each in space4.findall(tag):
+            tag = tag.replace(each, each[0] + ' ' + each[1:].lstrip())
+        # remove quotes on some attributes
+        tag = quotes_in_tag.sub(r'\1=\2', tag)
+        if original != tag:  # has the tag been improved ?
+            html = html.replace(original, tag)
+    return html.strip()
 
 
 def htmlmin(html):
@@ -457,6 +492,7 @@ def htmlmin(html):
     html = condense_script(html)
     html = clean_unneeded_html_tags(html)
     html = condense_html_whitespace(html)
+    html = unquote_html_attributes(html)
     log.info("Finished compressing HTML !.")
     return html.strip()
 
