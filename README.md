@@ -17,7 +17,8 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   --version             show programs version number and exit
-  -w WRAP, --wrap WRAP  Wrap Output to N chars per line, CSS Only.
+  --wrap WRAP           Wrap Output to N chars per line, CSS Only.
+  --timestamp           Add a Time Stamp on all CSS/JS output files.
   --quiet               Quiet, force disable all Logging.
   --checkupdates        Check for Updates from Internet.
 
@@ -59,6 +60,23 @@ sudo wget -O /usr/bin/css-html-js-minify https://raw.githubusercontent.com/juanc
 sudo chmod +x /usr/bin/css-html-js-minify
 css-html-js-minify
 ```
+
+
+# Why?:
+
+- **Why another Compressor ?**, theres lots of Compressor for Web files outthere!; *Or maybe not ?*.
+- Lots work inside DJango/Flask only, or Frameworks of PHP/Java/Ruby, or can Not process whole folders.
+
+| Name | Reason |
+| ---- | ------ |
+| [YUI-Compressor](www.yuiblog.com/blog/2012/10/16/state-of-yui-compressor) | Deprecated, Needs Java, Dead since ~2012, No HTML Minification, Complex to Install |
+| [UglifyJS](https://github.com/mishoo/UglifyJS2) | Needs NodeJS, No HTML/CSS Minification, Cant process whole folders, Slow |
+| [Slimmer](https://pypi.python.org/pypi/slimmer) | Python2 Only, No Unicode/UTF-8 Support, Dead since ~2009 |
+| [CSSMin](https://pypi.python.org/pypi/cssmin) | No Unicode/UTF-8 Support, Dead since ~2013, No HTML/JS Minification, Cant process whole folders |
+| [django-cssmin](https://github.com/zacharyvoase/django-cssmin) | Uses CSSMin which is Dead, DJango only, No HTML/JS Minification |
+| [SlimIt](https://pypi.python.org/pypi/slimit) | JS Only, to use as RunTime Module, Dead sincec ~2013, Cant process whole folders |
+| [JSMin](https://pypi.python.org/pypi/jsmin) | JS Only, Cant process whole folders |
+| All On-Line Minifiers | Cant process whole folders, Slow, No Unicode/UTF-8 Support usually |
 
 
 # Requisites:
