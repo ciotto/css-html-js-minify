@@ -17,8 +17,8 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   --version             show programs version number and exit
-  --wrap WRAP  Wrap Output to N chars per line, CSS Only.
-  --timestamp     Add a Time Stamp on all CSS/JS output files.
+  --wrap WRAP           Wrap Output to N chars per line, CSS Only.
+  --timestamp           Add a Time Stamp on all CSS/JS output files.
   --quiet               Quiet, force disable all Logging.
   --checkupdates        Check for Updates from Internet.
 
