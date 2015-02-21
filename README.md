@@ -69,7 +69,7 @@ css-html-js-minify
 | Name | Reason |
 | ---- | ------ |
 | [YUI-Compressor](www.yuiblog.com/blog/2012/10/16/state-of-yui-compressor) | Deprecated, Needs Java, Dead since ~2012, No HTML Minification, Complex to Install |
-| [UglifyJS](https://github.com/mishoo/UglifyJS2) | Needs NodeJS, No HTML/CSS Minification, Cant process whole folders |
+| [UglifyJS](https://github.com/mishoo/UglifyJS2) | Needs NodeJS, No HTML/CSS Minification, Cant process whole folders, Slow |
 | [Slimmer](https://pypi.python.org/pypi/slimmer) | Python2 Only, No Unicode/UTF-8 Support, Dead since ~2009 |
 | [CSSMin](https://pypi.python.org/pypi/cssmin) | No Unicode/UTF-8 Support, Dead since ~2013, No HTML/JS Minification, Cant process whole folders |
 | [django-cssmin](https://github.com/zacharyvoase/django-cssmin) | Uses CSSMin which is Dead, DJango only, No HTML/JS Minification |
