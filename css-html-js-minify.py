@@ -2,9 +2,11 @@
 # -*- coding: utf-8 -*-
 
 
-"""CSS-HTML-JS-Minify -
+"""CSS-HTML-JS-Minify.
+
 StandAlone Async single-file cross-platform no-dependencies
-Unicode-ready Python3-ready Minifier for the Web."""
+Unicode-ready Python3-ready Minifier for the Web.
+"""
 
 
 import logging as log
@@ -407,8 +409,8 @@ def cssmin(css, wrap=None):
 def condense_html_whitespace(html):
     """Condense HTML."""
     log.debug("Removing unnecessary HTML White Spaces and Empty New Lines.")
-    is_ok = not "<textarea" in html.lower() and not "<pre" in html.lower()
-    html = re.sub(r'>\s+<','><', html) if is_ok else html
+    is_ok = "<textarea" not in html.lower() and "<pre" not in html.lower()
+    html = re.sub(r'>\s+<', '><', html) if is_ok else html
     return re.sub(r'\s{2,}|[\r\n]', '', html) if is_ok else html.strip()
 
 
@@ -455,7 +457,7 @@ def unquote_html_attributes(html):
     """Remove all HTML quotes on attibutes if possible."""
     log.debug("Removing unnecessary Quotes on attributes of HTML tags.")
     # cache all regular expressions on variables before we enter the for loop.
-    any_tag = re.compile(r"<\w.*?>", re.I|re.MULTILINE|re.DOTALL)
+    any_tag = re.compile(r"<\w.*?>", re.I | re.MULTILINE | re.DOTALL)
     space = re.compile(r' \s+|\s +', re.MULTILINE)
     space1 = re.compile(r'\w\s+\w', re.MULTILINE)
     space2 = re.compile(r'"\s+>', re.MULTILINE)
@@ -474,7 +476,7 @@ def unquote_html_attributes(html):
         tag = space2.sub('">', tag)
         tag = space3.sub("'>", tag)
         for each in space1.findall(tag) + space6.findall(tag):
-            tag = tag.replace(each, space.sub(' ',each))
+            tag = tag.replace(each, space.sub(' ', each))
         for each in space4.findall(tag):
             tag = tag.replace(each, each[0] + ' ' + each[1:].lstrip())
         # remove quotes on some attributes
@@ -667,6 +669,7 @@ def process_multiple_files(file_path):
 def process_single_css_file(css_file_path, wrap_to=None):
     """Process a single CSS file."""
     log.info("Processing CSS file: {}".format(css_file_path))
+    global args
     try:  # Python3
         with open(css_file_path, encoding="utf-8-sig") as css_file:
             minified_css = cssmin(css_file.read(), wrap=wrap_to)
