@@ -40,7 +40,7 @@ __source__ = ('https://raw.githubusercontent.com/juancarlospaco/'
               'css-html-js-minify/master/css-html-js-minify.py')
 
 
-LIST_OF_FILES_PROCESSED, start_time = [], datetime.now()
+start_time = datetime.now()
 # 'Color Name String': (R, G, B)
 EXTENDED_NAMED_COLORS = {
     'azure': (240, 255, 255),
@@ -322,23 +322,7 @@ def wrap_css_lines(css, line_length):
 def condense_font_weight(css):
     """Condense multiple font weights into shorter integer equals."""
     log.debug("Condensing font weights on values.")
-    css = css.replace(':normal;', ':400;').replace(':bold;', ':700;')
-    css = css.replace(':lighter;', ':100;').replace(':bolder;', ':900;')
-    return css
-
-
-def condense_percentage_values(css):
-    """Condense percentage value to shorter replacement taking off 1%."""
-    log.debug("Condensing percentage values.")
-    return css.replace('100%', '99%').replace('10%', '9%')
-
-
-def condense_pixel_values(css):
-    """Condense pixel values to shorter replacement by taking off 1 px."""
-    log.debug("Condensing pixel values.")
-    css = css.replace('1000px', '999px').replace('100px', '99px')
-    css = css.replace('10px', '9px')
-    return css
+    return css.replace(':normal;', ':400;').replace(':bold;', ':700;')
 
 
 def condense_std_named_colors(css):
@@ -421,7 +405,7 @@ def cssmin(css, wrap=None):
 
 
 def condense_html_whitespace(html):
-    """Condense HTML."""
+    """Condense HTML, but be safe first if it have textareas or pre tags."""
     log.debug("Removing unnecessary HTML White Spaces and Empty New Lines.")
     is_ok = "<textarea" not in html.lower() and "<pre" not in html.lower()
     html = re.sub(r'>\s+<', '><', html) if is_ok else html
@@ -567,11 +551,8 @@ def slim_params(code):
         param_regex, new_params = re.compile(_param_regex), {}
         for i in range(len(params_split_use)):
             new_params[params_split[i]] = '__{}'.format(i)
-
-        def replacer(match):
-            return new_params.get(match.group())
-
-        new_core, _params = param_regex.sub(replacer, core), []
+        replacer_1 = lambda __match: new_params.get(__match.group())
+        new_core, _params = param_regex.sub(replacer_1, core), []
         for p in params_split:
             _params.append(new_params.get(p, p))
         new_function = function_start.replace(
@@ -579,11 +560,8 @@ def slim_params(code):
         old_function = function_start + core + '}'
         old_functions[old_function] = new_function
     regex = '|'.join([re.escape(x) for x in old_functions.keys()])
-
-    def replacer(match):
-        return old_functions.get(match.group())
-
-    return re.sub(regex, replacer, new_code)
+    replacer_2 = lambda __match: old_functions.get(__match.group())
+    return re.sub(regex, replacer_2, new_code)
 
 
 class NamesGenerator:
@@ -792,13 +770,12 @@ def prefixer_extensioner(file_path, old, new):
     replace '/folder.foo/file.foo' into '/folder.bar/file.bar' wrong!.
     """
     log.debug("Prepending Prefix to {}.".format(file_path))
-    global args, LIST_OF_FILES_PROCESSED
+    global args
     extension = os.path.splitext(file_path)[1].lower().replace(old, new)
     filenames = os.path.splitext(os.path.basename(file_path))[0]
     filenames = args.prefix + filenames if args.prefix else filenames
     dir_names = os.path.dirname(file_path)
     file_path = os.path.join(dir_names, filenames + extension)
-    LIST_OF_FILES_PROCESSED.append(file_path)
     return file_path
 
 
@@ -942,15 +919,15 @@ def main():
     # Work based on if argument is file or folder, folder is slower.
     if os.path.isfile(args.fullpath) and args.fullpath.endswith(".css"):
         log.info("Target is a CSS File.")
-        files_processed = 1
+        list_of_files = str(args.fullpath)
         process_single_css_file(args.fullpath)
     elif os.path.isfile(args.fullpath) and args.fullpath.endswith(".htm"):
         log.info("Target is a HTML File.")
-        files_processed = 1
+        list_of_files = str(args.fullpath)
         process_single_html_file(args.fullpath)
     elif os.path.isfile(args.fullpath) and args.fullpath.endswith(".js"):
         log.info("Target is a JS File.")
-        files_processed = 1
+        list_of_files = str(args.fullpath)
         process_single_js_file(args.fullpath)
     elif os.path.isdir(args.fullpath):
         log.info("Target is a Folder with CSS, HTML, JS.")
@@ -958,7 +935,6 @@ def main():
         list_of_files = walkdir_to_filelist(args.fullpath,
                                             (".css", ".js", ".htm"),
                                             (".min.css", ".min.js", ".html"))
-        files_processed = len(list_of_files)
         pool = Pool(cpu_count())  # Multiprocessing Async
         pool.map_async(process_multiple_files, list_of_files)
         pool.close()
@@ -972,15 +948,15 @@ def main():
             commit_message = str(input(">>> Git Commit Message ?: ")).strip()
             if len(commit_message):  # commit message must not be empty
                 cmd = "git commit -m '{}' {}".format(
-                    commit_message, " ".join(LIST_OF_FILES_PROCESSED))
+                    commit_message, " ".join(list_of_files))
                 log.warning("Running Git Auto-Commit command: {}".format(cmd))
                 call(cmd, shell=True)
             else:  # commit message empty
                 log.warning("Git Commit aborted due to Empty commit message.")
         except Exception as reason:
             log.critical(reason)  # something went wrong
-    log.info('New Files Created: {}.'.format(LIST_OF_FILES_PROCESSED))
-    log.info('Total Files Processed: {}.'.format(files_processed))
+    log.info('New Files Created: {}.'.format(list_of_files))
+    log.info('Total Files Processed: {}.'.format(len(list_of_files)))
     log.info('Total Processing Time: {}.'.format(datetime.now() - start_time))
 
 

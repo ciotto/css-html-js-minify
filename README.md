@@ -19,7 +19,7 @@ positional arguments:
 
 optional arguments:
     -h, --help       show this help message and exit
-    --version        show program's version number and exit
+    --version        show programs version number and exit
     --wrap           Wrap Output to ~80 chars per line, CSS Only.
     --prefix PREFIX  Prefix string to prepend on output filenames.
     --timestamp      Add a Time Stamp on all CSS/JS output files.
