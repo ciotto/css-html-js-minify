@@ -43,6 +43,13 @@ optional arguments:
 - `*.css` files are saved as `*.min.css`, `*.js` are saved as `*.min.js`, `*.htm` are saved as `*.html`
 
 
+# Screenshots:
+
+**MS Windows:**
+
+![screenshot](https://raw.githubusercontent.com/juancarlospaco/css-html-js-minify/master/windows-css-html-js-compressor.jpg "MS Windows 32bit/64bit Python2/Python3")
+
+
 # Usage:
 
 ```bash
