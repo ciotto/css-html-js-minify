@@ -1,5 +1,5 @@
 # css-html-js-minify
-
+![Travis report](https://travis-ci.org/juancarlospaco/css-html-js-minify.svg?branch=master "Travis-C.I. Testing report")
 - **StandAlone Async single-file cross-platform no-dependencies Unicode-ready Python3-ready Minifier for the Web.**
 
 
@@ -96,7 +96,7 @@ css-html-js-minify
 
 # Requisites:
 
-- [Python 3.x](https://www.python.org "Python Homepage") *(or Python 2.x)*
+- [Python 3.x](https://www.python.org "Python Homepage") *(or Python 2.x, or PyPy 2.x, or PyPy 3.x)*
 
 
 # Coding Style Guide:
