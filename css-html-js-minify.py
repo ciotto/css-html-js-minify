@@ -19,6 +19,7 @@ from ctypes import byref, cdll, create_string_buffer
 from multiprocessing import cpu_count, Pool
 from tempfile import gettempdir
 from datetime import datetime
+from subprocess import call
 
 try:
     from urllib import request
@@ -39,7 +40,7 @@ __source__ = ('https://raw.githubusercontent.com/juancarlospaco/'
               'css-html-js-minify/master/css-html-js-minify.py')
 
 
-start_time = datetime.now()
+LIST_OF_FILES_PROCESSED, start_time = [], datetime.now()
 # 'Color Name String': (R, G, B)
 EXTENDED_NAMED_COLORS = {
     'azure': (240, 255, 255),
@@ -775,25 +776,26 @@ def prefixer_extensioner(file_path, old, new):
     replace '/folder.foo/file.foo' into '/folder.bar/file.bar' wrong!.
     """
     log.debug("Prepending Prefix to {}.".format(file_path))
-    global args
+    global args, LIST_OF_FILES_PROCESSED
     extension = os.path.splitext(file_path)[1].lower().replace(old, new)
     filenames = os.path.splitext(os.path.basename(file_path))[0]
     filenames = args.prefix + filenames if args.prefix else filenames
     dir_names = os.path.dirname(file_path)
     file_path = os.path.join(dir_names, filenames + extension)
+    LIST_OF_FILES_PROCESSED.append(file_path)
     return file_path
 
 
-def process_single_css_file(css_file_path, wrap_to=None):
+def process_single_css_file(css_file_path):
     """Process a single CSS file."""
     log.info("Processing CSS file: {}".format(css_file_path))
     global args
     try:  # Python3
         with open(css_file_path, encoding="utf-8-sig") as css_file:
-            minified_css = cssmin(css_file.read(), wrap=wrap_to)
+            minified_css = cssmin(css_file.read(), wrap=80)
     except:  # Python2
         with open(css_file_path) as css_file:
-            minified_css = cssmin(css_file.read(), wrap=wrap_to)
+            minified_css = cssmin(css_file.read(), wrap=80)
     if args.timestamp:
         taim = "/* {} */ ".format(datetime.now().isoformat()[:-7].lower())
         minified_css = taim + minified_css
@@ -895,13 +897,14 @@ def main():
     # Parse command line arguments.
     parser = ArgumentParser(description=__doc__, epilog="""CSS-HTML-JS-Minify:
     Takes a file or folder full path string and process all CSS/HTML/JS found.
-    If argument is not a file or folder it will fail.
+    If argument is not file/folder will fail. Check Updates works on Python3.
+    Git Auto-Commit only works on Linux/OsX and asks for commit Message.
     StdIn to StdOut is deprecated since may fail with unicode characters.""")
     parser.add_argument('--version', action='version', version=__version__)
     parser.add_argument('fullpath', metavar='fullpath', type=str,
                         help='Full path to local file or folder.')
-    parser.add_argument('--wrap', type=int,
-                        help="Wrap Output to N chars per line, CSS Only.")
+    parser.add_argument('--wrap', action='store_true',
+                        help="Wrap Output to ~80 chars per line, CSS Only.")
     parser.add_argument('--prefix', type=str,
                         help="Prefix string to prepend on output filenames.")
     parser.add_argument('--timestamp', action='store_true',
@@ -910,6 +913,9 @@ def main():
                         help="Quiet, force disable all Logging.")
     parser.add_argument('--checkupdates', action='store_true',
                         help="Check for Updates from Internet while running.")
+    parser.add_argument('--autocommit', action='store_true',
+                        help="""Automatically commit all changed files to Git,
+                        ask for a commit message to be typed by the user.""")
     global args
     args = parser.parse_args()
     if args.checkupdates:
@@ -921,7 +927,7 @@ def main():
     if os.path.isfile(args.fullpath) and args.fullpath.endswith(".css"):
         log.info("Target is a CSS File.")
         files_processed = 1
-        process_single_css_file(args.fullpath, args.wrap)
+        process_single_css_file(args.fullpath)
     elif os.path.isfile(args.fullpath) and args.fullpath.endswith(".htm"):
         log.info("Target is a HTML File.")
         files_processed = 1
@@ -944,6 +950,20 @@ def main():
     else:
         log.critical("File or folder not found,or cant be read,or I/O Error.")
         sys.exit(1)
+    if args.autocommit and not sys.platform.startswith("win"):
+        log.debug("Automatically commit changed files to Git.")
+        try:  # commit to git the all the changed files at once
+            commit_message = str(input(">>> Git Commit Message ?: ")).strip()
+            if len(commit_message):  # commit message must not be empty
+                cmd = "git commit -m '{}' {}".format(
+                    commit_message, " ".join(LIST_OF_FILES_PROCESSED))
+                log.warning("Running Git Auto-Commit command: {}".format(cmd))
+                call(cmd, shell=True)
+            else:  # commit message empty
+                log.warning("Git Commit aborted due to Empty commit message.")
+        except Exception as reason:
+            log.critical(reason)  # something went wrong
+    log.info('New Files Created: {}.'.format(LIST_OF_FILES_PROCESSED))
     log.info('Total Files Processed: {}.'.format(files_processed))
     log.info('Total Processing Time: {}.'.format(datetime.now() - start_time))
 
