@@ -846,7 +846,7 @@ def main():
         buff.value = bytes("css-html-js-minify".encode("utf-8"))
         libc.prctl(15, byref(buff), 0, 0, 0)
     except Exception as reason:
-        log.debug(reason)
+        pass  # this may fail on windows and its normal, so be silent.
     # Parse command line arguments.
     parser = ArgumentParser(description=__doc__, epilog="""CSS-HTML-JS-Minify:
     Takes a file or folder full path string and process all CSS/HTML/JS found.
