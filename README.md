@@ -90,6 +90,11 @@ css-html-js-minify
 - [Python 3.x](https://www.python.org "Python Homepage") *(or Python 2.x)*
 
 
+# Coding Style Guide:
+
+- Lint, PEP-8, PEP-257, PyLama must Pass Ok. `pip install pep8 pep257 pylama`
+
+
 # Licence:
 
 - GNU GPL Latest Version *AND* GNU LGPL Latest Version *AND* any Licence YOU Request via Bug Report.
