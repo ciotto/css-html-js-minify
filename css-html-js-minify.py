@@ -12,15 +12,14 @@ Unicode-ready Python3-ready Minifier for the Web.
 import logging as log
 import os
 import re
+import resource
 import sys
 from argparse import ArgumentParser
 from copy import copy
 from ctypes import byref, cdll, create_string_buffer
+from datetime import datetime
 from multiprocessing import cpu_count, Pool
 from tempfile import gettempdir
-from datetime import datetime
-from subprocess import call
-import resource
 
 try:
     from urllib import request
@@ -309,13 +308,13 @@ def add_encoding(css):
 
 
 def restore_needed_space(css):
-    """This fix CSS for some specific cases where a white space is needed."""
+    """Fix CSS for some specific cases where a white space is needed."""
     return css.replace("!important", " !important"
                        ).replace("@media(", "@media (")
 
 
 def unquote_selectors(css):
-    """This fix CSS for some specific selectors where Quotes is not needed."""
+    """Fix CSS for some specific selectors where Quotes is not needed."""
     log.debug("Removing unnecessary Quotes on selectors of CSS classes.")
     return re.compile('([a-zA-Z]+)="([a-zA-Z0-9-_\.]+)"]').sub(r'\1=\2]', css)
 
