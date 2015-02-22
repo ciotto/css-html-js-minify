@@ -20,6 +20,7 @@ from multiprocessing import cpu_count, Pool
 from tempfile import gettempdir
 from datetime import datetime
 from subprocess import call
+import resource
 
 try:
     from urllib import request
@@ -955,8 +956,12 @@ def main():
                 log.warning("Git Commit aborted due to Empty commit message.")
         except Exception as reason:
             log.critical(reason)  # something went wrong
-    log.info('New Files Created: {}.'.format(list_of_files))
-    log.info('Total Files Processed: {}.'.format(len(list_of_files)))
+    log.info('Files Processed: {}.'.format(list_of_files))
+    log.info('Number of Files Processed: {}.'.format(len(list_of_files)))
+    log.info('Total Maximum RAM Memory used: ~{} MegaBytes.'.format(int(
+        resource.getrusage(resource.RUSAGE_SELF).ru_maxrss *
+        resource.getpagesize() / 1024 / 1024
+        if not sys.platform.startswith("win") else 0)))
     log.info('Total Processing Time: {}.'.format(datetime.now() - start_time))
 
 
