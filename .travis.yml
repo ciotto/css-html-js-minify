@@ -41,11 +41,8 @@ after_failure: true
 notifications:
     email:
         recipients: juancarlospaco@gmail.com
-        template:
-            - "%{repository}@%{branch}: %{message}(%{build_url})"
-            - "Build: %{build_number}, SHA: %{commit}, Committer: %{author}, Diff: %{compare_url}"
-            on_success: change
-            on_failure: always
+        on_success: change
+        on_failure: always
 
 
 cache: apt
