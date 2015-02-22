@@ -793,7 +793,7 @@ def check_for_updates():
     this_version = str(open(__file__).read())
     last_version = str(request.urlopen(__source__).read().decode("utf8"))
     if this_version != last_version:
-        log.warning("Theres new Version available!,Download update from Web.")
+        log.warning("Theres new Version available!,Update from " + __source__)
     else:
         log.info("No new updates!,You have the lastest version of this app.")
 
