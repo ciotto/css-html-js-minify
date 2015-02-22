@@ -814,7 +814,7 @@ def main():
                     return fn(*args)
                 levelno = new_args[1].levelno
                 if levelno >= 50:
-                    color = '\x1b[31;5;7m '  # blinking red with black
+                    color = '\x1b[31;5;7m\n '  # blinking red with black
                 elif levelno >= 40:
                     color = '\x1b[31m'  # red
                 elif levelno >= 30:
