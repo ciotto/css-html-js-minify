@@ -25,9 +25,10 @@ optional arguments:
     --quiet          Quiet, force disable all Logging.
     --checkupdates   Check for Updates from Internet while running.
 
-    CSS-HTML-JS-Minify: Takes a file or folder full path string and process all
-    CSS/HTML/JS found. If argument is not file/folder will fail. Check Updates
-    works on Python3.
+    CSS-HTML-JS-Minify: 
+    Takes a file or folder full path string and process all CSS/HTML/JS found. 
+    If argument is not file/folder will fail. 
+    Check Updates works on Python3.
     StdIn to StdOut is deprecated since may fail with unicode characters.
 
 ```
