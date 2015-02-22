@@ -826,7 +826,7 @@ def main():
                 else:
                     color = '\x1b[0m'  # normal
                 try:
-                    new_args[1].msg = color + str(new_args[1].msg) + '\x1b[0m'
+                    new_args[1].msg = color + str(new_args[1].msg) + ' \x1b[0m'
                 except Exception as reason:
                     print(reason)  # Do not use log here.
                 return fn(*new_args)
