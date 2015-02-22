@@ -892,7 +892,6 @@ def main():
     parser = ArgumentParser(description=__doc__, epilog="""CSS-HTML-JS-Minify:
     Takes a file or folder full path string and process all CSS/HTML/JS found.
     If argument is not file/folder will fail. Check Updates works on Python3.
-    Git Auto-Commit only works on Linux/OsX and asks for commit Message.
     StdIn to StdOut is deprecated since may fail with unicode characters.""")
     parser.add_argument('--version', action='version', version=__version__)
     parser.add_argument('fullpath', metavar='fullpath', type=str,
@@ -907,9 +906,6 @@ def main():
                         help="Quiet, force disable all Logging.")
     parser.add_argument('--checkupdates', action='store_true',
                         help="Check for Updates from Internet while running.")
-    parser.add_argument('--autocommit', action='store_true',
-                        help="""Automatically commit all changed files to Git,
-                        ask for a commit message to be typed by the user.""")
     global args
     args = parser.parse_args()
     if args.checkupdates:
@@ -943,19 +939,7 @@ def main():
     else:
         log.critical("File or folder not found,or cant be read,or I/O Error.")
         sys.exit(1)
-    if args.autocommit and not sys.platform.startswith("win"):
-        log.debug("Automatically commit changed files to Git.")
-        try:  # commit to git the all the changed files at once
-            commit_message = str(input(">>> Git Commit Message ?: ")).strip()
-            if len(commit_message):  # commit message must not be empty
-                cmd = "git commit -m '{}' {}".format(
-                    commit_message, " ".join(list_of_files))
-                log.warning("Running Git Auto-Commit command: {}".format(cmd))
-                call(cmd, shell=True)
-            else:  # commit message empty
-                log.warning("Git Commit aborted due to Empty commit message.")
-        except Exception as reason:
-            log.critical(reason)  # something went wrong
+    log.info('-' * 80)
     log.info('Files Processed: {}.'.format(list_of_files))
     log.info('Number of Files Processed: {}.'.format(len(list_of_files)))
     log.info('Total Maximum RAM Memory used: ~{} MegaBytes.'.format(int(

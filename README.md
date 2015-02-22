@@ -25,13 +25,11 @@ optional arguments:
     --timestamp      Add a Time Stamp on all CSS/JS output files.
     --quiet          Quiet, force disable all Logging.
     --checkupdates   Check for Updates from Internet while running.
-    --autocommit     Automatically commit all changed files to Git, ask for a
-    commit message to be typed by the user.
 
     CSS-HTML-JS-Minify: Takes a file or folder full path string and process all
     CSS/HTML/JS found. If argument is not file/folder will fail. Check Updates
-    works on Python3. Git Auto-Commit only works on Linux/OsX and asks for commit
-    Message. StdIn to StdOut is deprecated since may fail with unicode characters.
+    works on Python3.
+    StdIn to StdOut is deprecated since may fail with unicode characters.
 
 ```
 
