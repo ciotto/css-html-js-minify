@@ -10,9 +10,12 @@ python:
     - "pypy3"
 
 
-before_install:
-    - sudo apt-get update -qqm
-    - sudo apt-get install -qqm wget
+os:
+    - linux
+    - osx
+
+
+before_install: true
 
 
 install: true
