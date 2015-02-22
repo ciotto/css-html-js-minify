@@ -545,7 +545,10 @@ def _findFunctions(whole):
         stack, code, core_code = 1, function_start, ''
         start = whole.find(function_start) + len(code)
         while stack > 0:
-            next_char = whole[start]
+            try:
+                next_char = whole[start]
+            except IndexError:  # dont worry we will obfuscte the one we found
+                return  # sometimes fails to find all functions on big files
             core_code += next_char
             if next_char == '{':
                 stack += 1
@@ -563,7 +566,7 @@ def slim_params(code):
         _param_regex = '|'.join([r'\b%s\b' % x for x in params_split_use])
         param_regex, new_params = re.compile(_param_regex), {}
         for i in range(len(params_split_use)):
-            new_params[params_split[i]] = '_{}'.format(i)
+            new_params[params_split[i]] = '__{}'.format(i)
 
         def replacer(match):
             return new_params.get(match.group())
@@ -607,7 +610,7 @@ class NamesGenerator:
                 self.i += 1
                 self.j = 0
                 return self.next()
-        return '_{}'.format(e)
+        return '__{}'.format(e)
 
 
 def slim_func_names(js):
