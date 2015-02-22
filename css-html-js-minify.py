@@ -12,7 +12,6 @@ Unicode-ready Python3-ready Minifier for the Web.
 import logging as log
 import os
 import re
-import resource
 import sys
 from argparse import ArgumentParser
 from copy import copy
@@ -29,6 +28,10 @@ try:
     from StringIO import StringIO  # pure-Python StringIO supports unicode.
 except ImportError:
     from io import StringIO  # lint:ok
+try:
+    import resource
+except ImportError:
+    resource = None  # windows dont have resource
 
 
 __version__ = '1.0.0'
@@ -901,8 +904,7 @@ def main():
         len(list_of_files) if isinstance(list_of_files, tuple) else 1))
     log.info('Total Maximum RAM Memory used: ~{} MegaBytes.'.format(int(
         resource.getrusage(resource.RUSAGE_SELF).ru_maxrss *
-        resource.getpagesize() / 1024 / 1024
-        if not sys.platform.startswith("win") else 0)))
+        resource.getpagesize() / 1024 / 1024 if resource else 0)))
     log.info('Total Processing Time: {}.'.format(datetime.now() - start_time))
 
 
