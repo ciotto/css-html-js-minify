@@ -6,26 +6,33 @@
 ```bash
 css-html-js-minify.py --help
 
-usage: css-html-js-minify.py [-h] [--version] [-w WRAP] [--quiet] fullpath
+usage: css-html-js-minify.py [-h] [--version] [--wrap] [--prefix PREFIX]
+[--timestamp] [--quiet] [--checkupdates]
+[--autocommit]
+fullpath
 
-CSS-HTML-JS-Minify - StandAlone Async single-file cross-platform 
-no-dependencies Unicode-ready Python3-ready Minifier for the Web.
+CSS-HTML-JS-Minify. StandAlone Async single-file cross-platform no-
+dependencies Unicode-ready Python3-ready Minifier for the Web.
 
 positional arguments:
-  fullpath              Full path to local file or folder.
+    fullpath         Full path to local file or folder.
 
 optional arguments:
-  -h, --help            show this help message and exit
-  --version             show programs version number and exit
-  --wrap WRAP           Wrap Output to N chars per line, CSS Only.
-  --timestamp           Add a Time Stamp on all CSS/JS output files.
-  --quiet               Quiet, force disable all Logging.
-  --checkupdates        Check for Updates from Internet.
+    -h, --help       show this help message and exit
+    --version        show program's version number and exit
+    --wrap           Wrap Output to ~80 chars per line, CSS Only.
+    --prefix PREFIX  Prefix string to prepend on output filenames.
+    --timestamp      Add a Time Stamp on all CSS/JS output files.
+    --quiet          Quiet, force disable all Logging.
+    --checkupdates   Check for Updates from Internet while running.
+    --autocommit     Automatically commit all changed files to Git, ask for a
+    commit message to be typed by the user.
 
-CSS-HTML-JS-Minify: 
-Takes a file or folder full path string and process all CSS/HTML/JS found. 
-If argument is not a file or folder it will fail. This does Not Obfuscate.
-StdIn to StdOut is deprecated since may fail with unicode characters.
+    CSS-HTML-JS-Minify: Takes a file or folder full path string and process all
+    CSS/HTML/JS found. If argument is not file/folder will fail. Check Updates
+    works on Python3. Git Auto-Commit only works on Linux/OsX and asks for commit
+    Message. StdIn to StdOut is deprecated since may fail with unicode characters.
+
 ```
 
 - Takes a full path to anything, a file or a folder, then parse, optimize and compress for Production.
