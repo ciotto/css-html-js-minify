@@ -8,7 +8,6 @@ css-html-js-minify.py --help
 
 usage: css-html-js-minify.py [-h] [--version] [--wrap] [--prefix PREFIX]
 [--timestamp] [--quiet] [--checkupdates]
-[--autocommit]
 fullpath
 
 CSS-HTML-JS-Minify. StandAlone Async single-file cross-platform no-
