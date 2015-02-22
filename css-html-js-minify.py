@@ -794,8 +794,12 @@ def process_single_css_file(css_file_path):
         taim = "/* {} */ ".format(datetime.now().isoformat()[:-7].lower())
         minified_css = taim + minified_css
     css_file_path = prefixer_extensioner(css_file_path, ".css", ".min.css")
-    with open(css_file_path, "w") as output_file:
-        output_file.write(minified_css)
+    try:
+        with open(css_file_path, "w", encoding="utf-8") as output_file:
+            output_file.write(minified_css)
+    except:
+        with open(css_file_path, "w") as output_file:
+            output_file.write(minified_css)
 
 
 def process_single_html_file(html_file_path):
@@ -808,8 +812,12 @@ def process_single_html_file(html_file_path):
         with open(html_file_path) as html_file:
             minified_html = htmlmin(html_file.read())
     html_file_path = prefixer_extensioner(html_file_path, ".htm", ".html")
-    with open(html_file_path, "w") as output_file:
-        output_file.write(minified_html)
+    try:  # Python3
+        with open(html_file_path, "w", encoding="utf-8") as output_file:
+            output_file.write(minified_html)
+    except:  # Python2
+        with open(html_file_path, "w") as output_file:
+            output_file.write(minified_html)
 
 
 def process_single_js_file(js_file_path):
@@ -825,8 +833,12 @@ def process_single_js_file(js_file_path):
         taim = "/* {} */ ".format(datetime.now().isoformat()[:-7].lower())
         minified_js = taim + minified_js
     js_file_path = prefixer_extensioner(js_file_path, ".js", ".min.js")
-    with open(js_file_path, "w") as output_file:
-        output_file.write(minified_js)
+    try:  # Python3
+        with open(js_file_path, "w", encoding="utf-8") as output_file:
+            output_file.write(minified_js)
+    except:  # Python2
+        with open(js_file_path, "w") as output_file:
+            output_file.write(minified_js)
 
 
 def check_for_updates():
