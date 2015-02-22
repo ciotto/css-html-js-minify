@@ -344,9 +344,8 @@ def condense_pixel_values(css):
 def condense_std_named_colors(css):
     """Condense named color values to shorter replacement using HEX."""
     log.debug("Condensing standard named color values.")
-    for k, v in iter(tuple({
-        'aqua': '#0ff', 'black': '#000', 'blue': '#00f',
-            'fuchsia': '#f0f', 'yellow': '#ff0'}.items())):
+    for k, v in iter(tuple({'aqua': '#0ff', 'blue': '#00f',
+                            'fuchsia': '#f0f', 'yellow': '#ff0'}.items())):
         css = css.replace(k, v)
     return css
 
