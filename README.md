@@ -45,6 +45,10 @@ optional arguments:
 
 # Screenshots:
 
+**Linux:**
+
+![screenshot](https://raw.githubusercontent.com/juancarlospaco/css-html-js-minify/master/linux-css-html-js-compressor.jpg "Linux 32bit/64bit Python2/Python3")
+
 **MS Windows:**
 
 ![screenshot](https://raw.githubusercontent.com/juancarlospaco/css-html-js-minify/master/windows-css-html-js-compressor.jpg "MS Windows 32bit/64bit Python2/Python3")
