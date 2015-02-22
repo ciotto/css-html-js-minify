@@ -941,7 +941,8 @@ def main():
         sys.exit(1)
     log.info('-' * 80)
     log.info('Files Processed: {}.'.format(list_of_files))
-    log.info('Number of Files Processed: {}.'.format(len(list_of_files)))
+    log.info('Number of Files Processed: {}'.format(
+        len(list_of_files) if isinstance(list_of_files, tuple) else 1))
     log.info('Total Maximum RAM Memory used: ~{} MegaBytes.'.format(int(
         resource.getrusage(resource.RUSAGE_SELF).ru_maxrss *
         resource.getpagesize() / 1024 / 1024
