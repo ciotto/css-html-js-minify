@@ -1,0 +1,49 @@
+language: python
+
+
+python:
+    - "2.7"
+    - "3.4"
+    - "pypy"
+    - "pypy3"
+
+
+before_install:
+    - sudo apt-get update -qqm
+    - sudo apt-get install -qqm wget
+
+
+install: true
+
+
+before_script: rm --recursive --force --verbose *.py[cod]
+
+
+script:
+    - wget https://code.jquery.com/jquery-git2.js
+    - chmod +x $TRAVIS_BUILD_DIR/css-html-js-minify.py
+    - $TRAVIS_BUILD_DIR/css-html-js-minify.py --prefix temp_ --timestamp $TRAVIS_BUILD_DIR/jquery-git2.js
+    - wget https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.css
+    - $TRAVIS_BUILD_DIR/css-html-js-minify.py --prefix temp_ --timestamp --wrap $TRAVIS_BUILD_DIR/bootstrap.css
+
+
+after_script: true
+
+
+after_success: true
+
+
+after_failure: true
+
+
+notifications:
+    email:
+        recipients: juancarlospaco@gmail.com
+        template:
+            - "%{repository}@%{branch}: %{message}(%{build_url})"
+            - "Build: %{build_number}, SHA: %{commit}, Committer: %{author}, Diff: %{compare_url}"
+            on_success: change
+            on_failure: always
+
+
+cache: apt
