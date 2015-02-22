@@ -346,7 +346,7 @@ def condense_std_named_colors(css):
     log.debug("Condensing standard named color values.")
     for k, v in iter(tuple({
         'aqua': '#0ff', 'black': '#000', 'blue': '#00f',
-            'fuchsia': '#f0f', 'white': '#fff', 'yellow': '#ff0'}.items())):
+            'fuchsia': '#f0f', 'yellow': '#ff0'}.items())):
         css = css.replace(k, v)
     return css
 
@@ -379,10 +379,23 @@ def add_encoding(css):
     return "@charset utf-8;" + css if "@charset" not in css.lower() else css
 
 
+def restore_needed_space(css):
+    """This fix CSS for some specific cases where a white space is needed."""
+    return css.replace("!important", " !important"
+                       ).replace("@media(", "@media (")
+
+
+def unquote_selectors(css):
+    """This fix CSS for some specific selectors where Quotes is not needed."""
+    log.debug("Removing unnecessary Quotes on selectors of CSS classes.")
+    return re.compile('([a-zA-Z]+)="([a-zA-Z0-9-_\.]+)"]').sub(r'\1=\2]', css)
+
+
 def cssmin(css, wrap=None):
     """Minify CSS main function."""
     log.info("Compressing CSS...")
     css = remove_comments(css)
+    css = unquote_selectors(css)
     css = condense_whitespace(css)
     css = remove_url_quotes(css)
     css = condense_xtra_named_colors(css)
@@ -399,6 +412,7 @@ def cssmin(css, wrap=None):
     css = wrap_css_lines(css, wrap) if wrap is not None else css
     css = condense_semicolons(css)
     css = add_encoding(css)
+    css = restore_needed_space(css)
     log.info("Finished compressing CSS !.")
     return css.strip()
 
