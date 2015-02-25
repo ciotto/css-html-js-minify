@@ -394,9 +394,9 @@ def clean_unneeded_html_tags(html):
 
 def remove_html_comments(html):
     """Remove all HTML comments."""
-    log.debug("Removing unnecessary HTML comments.")
-    html = re.compile(r'<!--[\w\s].*?-->', re.I).sub('', html)  # 1 line
-    return re.sub("<!--.*?-->", "", html)  # multi-line comments
+    log.debug("""Removing all unnecessary HTML comments; Keep all containing:
+    'build:', 'endbuild', '<!--[if]>', '<![endif]-->' for Grunt/Grymt, IE.""")
+    return re.compile('<!-- [^(build|endbuild)].*? -->', re.I).sub('', html)
 
 
 def unquote_html_attributes(html):
@@ -604,7 +604,7 @@ class JavascriptMinify(object):
             previous_non_space = ' '
         if not next1:
             return
-        while 1:
+        while True:
             next2 = read(1)
             if not next2:
                 last = next1.strip()
