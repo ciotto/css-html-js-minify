@@ -523,7 +523,7 @@ def slim_params(code):
     """Compress params on Javascript code functions.
 
     >>> slim_params('function f(large_name,is_large){large_name*is_large}')
-    'function f(__0,__1){__0*__1}'
+    'function f(_0,_1){_0*_1}'
     """
     old_functions, new_code = {}, code
     for params, params_split, core, function_start in _findFunctions(code):
@@ -531,7 +531,7 @@ def slim_params(code):
         _param_regex = '|'.join([r'\b%s\b' % x for x in params_split_use])
         param_regex, new_params = re.compile(_param_regex), {}
         for i in range(len(params_split_use)):
-            new_params[params_split[i]] = '__{}'.format(i)
+            new_params[params_split[i]] = '_{}'.format(i)
         replacer_1 = lambda __match: new_params.get(__match.group())
         new_core, _params = param_regex.sub(replacer_1, core), []
         for p in params_split:
@@ -557,7 +557,7 @@ class NamesGenerator:
         """Work with next items.
 
         >>> _=NamesGenerator();(_.next(),_.next(),_.next(),_.next(),_.next())
-        ('__A', '__B', '__C', '__D', '__E')
+        ('_A', '_B', '_C', '_D', '_E')
         """
         try:
             e = self.pool[self.i]
@@ -573,14 +573,14 @@ class NamesGenerator:
                 self.i += 1
                 self.j = 0
                 return self.next()
-        return '__{}'.format(e)
+        return '_{}'.format(e)
 
 
 def slim_func_names(js):
     """Compress Javascript variable names inside functions.
 
     >>> slim_func_names('function longName(p1,p2){return p1*p2}longName(2,4)')
-    'function __A(p1,p2){return p1*p2}__A(2,4);var longName=__A;'
+    'function _A(p1,p2){return p1*p2}_A(2,4);var longName=_A;'
     """
     renamed_func, functions = [], re.compile('(function (\w+)\()').findall(js)
     new_names_generator = NamesGenerator()
@@ -602,7 +602,7 @@ def slim(js):
     """Compress variables and functions names.
 
     >>> slim('function foo( long_variable_name, bar ) { console.log(bar); };')
-    'function foo(__0,__1) { console.log(__1); };'
+    'function foo(_0,_1) { console.log(_1); };'
     """
     log.debug("Obfuscating Javascript variables names inside functions.")
     # if eval() or with{} is used on JS is not too Safe to Obfuscate stuff.
