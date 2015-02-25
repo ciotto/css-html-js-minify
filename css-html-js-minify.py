@@ -19,6 +19,7 @@ from ctypes import byref, cdll, create_string_buffer
 from datetime import datetime
 from multiprocessing import cpu_count, Pool
 from tempfile import gettempdir
+from doctest import testmod
 
 try:
     from urllib import request
@@ -353,15 +354,23 @@ def cssmin(css, wrap=None):
 
 
 def condense_html_whitespace(html):
-    """Condense HTML, but be safe first if it have textareas or pre tags."""
+    """Condense HTML, but be safe first if it have textareas or pre tags.
+
+    >>> condense_html_whitespace('<i>  <b>    <a> test </a>    </b> </i><br>')
+    '<i><b><a> test </a></b></i><br>'
+    """
     log.debug("Removing unnecessary HTML White Spaces and Empty New Lines.")
     is_ok = "<textarea" not in html.lower() and "<pre" not in html.lower()
     html = re.sub(r'>\s+<', '><', html) if is_ok else html
-    return re.sub(r'\s{2,}|[\r\n]', '', html) if is_ok else html.strip()
+    return re.sub(r'\s{2,}|[\r\n]', ' ', html) if is_ok else html.strip()
 
 
 def condense_style(html):
-    """Condense style html tags."""
+    """Condense style html tags.
+
+    >>> condense_style('<style type="text/css">*{border:0}</style><p>a b c')
+    '<style>*{border:0}</style><p>a b c'
+    """
     log.debug("Condensing HTML Style CSS tags.")
     html = html.replace('<style type="text/css">', '<style>')
     html = html.replace("<style type='text/css'>", '<style>')
@@ -370,7 +379,11 @@ def condense_style(html):
 
 
 def condense_script(html):
-    """Condense script html tags."""
+    """Condense script html tags.
+
+    >>> condense_script('<script type="text/javascript"> </script><p>a b c')
+    '<script> </script><p>a b c'
+    """
     log.debug("Condensing HTML Script JS tags.")
     html = html.replace('<script type="text/javascript">', '<script>')
     html = html.replace("<style type='text/javascript'>", '<script>')
@@ -379,7 +392,11 @@ def condense_script(html):
 
 
 def clean_unneeded_html_tags(html):
-    """Clean unneeded optional html tags."""
+    """Clean unneeded optional html tags.
+
+    >>> clean_unneeded_html_tags('a<body></img></td>b</th></tr></hr></br>c')
+    'abc'
+    """
     log.debug("Removing unnecessary optional HTML tags.")
     for tag_to_remove in (  # May look silly but Emmet does this and is wrong.
         '</area>', '</base>', '<body>', '</body>', '</br>', '</col>',
@@ -393,14 +410,23 @@ def clean_unneeded_html_tags(html):
 
 
 def remove_html_comments(html):
-    """Remove all HTML comments."""
+    """Remove all HTML comments, Keep all for Grunt, Grymt and IE.
+
+    >>> _="<!-- build:dev -->a<!-- endbuild -->b<!--[if IE 7]>c<![endif]--> "
+    >>> _+= "<!-- kill me please -->keep" ; remove_html_comments(_)
+    '<!-- build:dev -->a<!-- endbuild -->b<!--[if IE 7]>c<![endif]--> keep'
+    """  # Grunt uses comments to as build arguments, bad practice but still.
     log.debug("""Removing all unnecessary HTML comments; Keep all containing:
     'build:', 'endbuild', '<!--[if]>', '<![endif]-->' for Grunt/Grymt, IE.""")
     return re.compile('<!-- [^(build|endbuild)].*? -->', re.I).sub('', html)
 
 
 def unquote_html_attributes(html):
-    """Remove all HTML quotes on attibutes if possible."""
+    """Remove all HTML quotes on attibutes if possible.
+
+    >>> unquote_html_attributes('<img   width="9" height="5" data-foo="0"  >')
+    '<img width=9 height=5 data-foo=0 >'
+    """  # data-foo=0> might cause errors on IE, we leave 1 space data-foo=0 >
     log.debug("Removing unnecessary Quotes on attributes of HTML tags.")
     # cache all regular expressions on variables before we enter the for loop.
     any_tag = re.compile(r"<\w.*?>", re.I | re.MULTILINE | re.DOTALL)
@@ -419,8 +445,8 @@ def unquote_html_attributes(html):
             continue
         original = tag
         # remove white space inside the tag itself
-        tag = space2.sub('">', tag)
-        tag = space3.sub("'>", tag)
+        tag = space2.sub('" >', tag)
+        tag = space3.sub("' >", tag)
         for each in space1.findall(tag) + space6.findall(tag):
             tag = tag.replace(each, space.sub(' ', each))
         for each in space4.findall(tag):
@@ -433,7 +459,11 @@ def unquote_html_attributes(html):
 
 
 def htmlmin(html):
-    """Minify HTML main function."""
+    """Minify HTML main function.
+
+    >>> htmlmin(' <p  width="9" height="5"  > <!-- a --> b </p> c <br> ')
+    '<p width=9 height=5 > b c <br>'
+    """
     log.info("Compressing HTML...")
     html = remove_html_comments(html)
     html = condense_style(html)
@@ -867,10 +897,15 @@ def main():
                         help="Quiet, force disable all Logging.")
     parser.add_argument('--checkupdates', action='store_true',
                         help="Check for Updates from Internet while running.")
+    parser.add_argument('--tests', action='store_true',
+                        help="Run all built-in Unit Tests, report and exit.")
     global args
     args = parser.parse_args()
     if args.checkupdates:
         check_for_updates()
+    if args.tests:
+        testmod(verbose=True, report=True, exclude_empty=True)
+        sys.exit(0)
     if args.quiet:
         log.disable(log.CRITICAL)
     log.info(__doc__ + __version__)
