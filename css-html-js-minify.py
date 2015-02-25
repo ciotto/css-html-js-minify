@@ -482,7 +482,7 @@ def htmlmin(html):
 def jsmin(js):
     """Return a minified version of the Javascript string."""
     log.info("Compressing Javascript...")
-    ins, outs = StringIO(js), StringIO()
+    ins, outs = StringIO(js.replace("debugger;", ";")), StringIO()
     JavascriptMinify(ins, outs).minify()
     return condense_semicolons(force_single_line_js(outs.getvalue()))
 
