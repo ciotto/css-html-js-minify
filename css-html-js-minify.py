@@ -499,11 +499,7 @@ function_start_regex = re.compile('(function(\s+\w+|)\s*\(([^\)]*)\)\s*{)')
 
 
 def _findFunctions(whole):
-    """Find function() on Javascript code.
-
-    >>> type(_findFunctions('function foo(){return};function bar(){return};'))
-    <type 'generator'>
-    """
+    """Find function() on Javascript code."""
     for res in function_start_regex.findall(whole):
         function_start, function_name, params = res
         params_split = [x.strip() for x in params.split(',')]
@@ -925,7 +921,7 @@ def main():
     if args.checkupdates:
         check_for_updates()
     if args.tests:
-        testmod(verbose=True, report=True, exclude_empty=1, raise_on_error=1)
+        testmod(verbose=True, report=True, exclude_empty=True)
         sys.exit(0)
     if args.quiet:
         log.disable(log.CRITICAL)
