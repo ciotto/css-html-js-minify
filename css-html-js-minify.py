@@ -499,7 +499,11 @@ function_start_regex = re.compile('(function(\s+\w+|)\s*\(([^\)]*)\)\s*{)')
 
 
 def _findFunctions(whole):
-    """Find function() on Javascript code."""
+    """Find function() on Javascript code.
+
+    >>> type(_findFunctions('function foo(){return};function bar(){return};'))
+    <type 'generator'>
+    """
     for res in function_start_regex.findall(whole):
         function_start, function_name, params = res
         params_split = [x.strip() for x in params.split(',')]
@@ -520,7 +524,11 @@ def _findFunctions(whole):
 
 
 def slim_params(code):
-    """Compress params on Javascript code functions."""
+    """Compress params on Javascript code functions.
+
+    >>> slim_params('function f(large_name,is_large){large_name*is_large}')
+    'function f(__0,__1){__0*__1}'
+    """
     old_functions, new_code = {}, code
     for params, params_split, core, function_start in _findFunctions(code):
         params_split_use = [x for x in params_split if len(x) > 1]
