@@ -580,7 +580,7 @@ def slim_func_names(js):
     """Compress Javascript variable names inside functions.
 
     >>> slim_func_names('function longName(p1,p2){return p1*p2}longName(2,4)')
-    'function __A(p1,p2){return p1*p2}__A(2,4)var longName=__A'
+    'function __A(p1,p2){return p1*p2}__A(2,4);var longName=__A;'
     """
     renamed_func, functions = [], re.compile('(function (\w+)\()').findall(js)
     new_names_generator = NamesGenerator()
@@ -592,7 +592,10 @@ def slim_func_names(js):
                 continue
             js = re.sub(r'\b%s\b' % re.escape(func_name), new_name, js)
             renamed_func.append((func_name, new_name))
-    return js + ';'.join(['var {}={}'.format(x, y) for (x, y) in renamed_func])
+    list_of_replacements = ['{}={}'.format(x, y) for (x, y) in renamed_func]
+    js_function_name_replacements = ';var {};'.format(  # ;var a=b,c=d; or ''
+        ','.join(list_of_replacements)) if len(list_of_replacements) else ""
+    return js + js_function_name_replacements
 
 
 def slim(js):
