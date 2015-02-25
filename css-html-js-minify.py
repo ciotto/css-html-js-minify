@@ -496,7 +496,6 @@ def force_single_line_js(js):
 # regular expressions to find and work with Javascript functions and variables
 function_start_regex = re.compile('(function[ \w+\s*]\(([^\)]*)\)\s*{)')
 function_start_regex = re.compile('(function(\s+\w+|)\s*\(([^\)]*)\)\s*{)')
-function_name_regex = re.compile('(function (\w+)\()')
 
 
 def _findFunctions(whole):
@@ -551,7 +550,11 @@ class NamesGenerator:
         self.i, self.pool = 0, list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
 
     def next(self):
-        """Work with next items."""
+        """Work with next items.
+
+        >>> _=NamesGenerator();(_.next(),_.next(),_.next(),_.next(),_.next())
+        ('__A', '__B', '__C', '__D', '__E')
+        """
         try:
             e = self.pool[self.i]
             self.i = self.i + 1
@@ -570,12 +573,16 @@ class NamesGenerator:
 
 
 def slim_func_names(js):
-    """Compress Javascript variable names inside functions."""
-    renamed_func, functions = [], function_name_regex.findall(js)
+    """Compress Javascript variable names inside functions.
+
+    >>> slim_func_names('function longName(p1,p2){return p1*p2}longName(2,4)')
+    'function __A(p1,p2){return p1*p2}__A(2,4)var longName=__A'
+    """
+    renamed_func, functions = [], re.compile('(function (\w+)\()').findall(js)
     new_names_generator = NamesGenerator()
     for whole_func, func_name in functions:
-        count = js.count(func_name)
-        if len(func_name) > 2 and count > 1:
+        count = js.count(func_name)  # more than 1 mention of the function
+        if len(func_name) > 3 and count > 1:  # function name larger than 3
             new_name = new_names_generator.next()
             if re.findall(r'\b%s\b' % re.escape(new_name), js):
                 continue
@@ -585,7 +592,11 @@ def slim_func_names(js):
 
 
 def slim(js):
-    """Compress variables and functions names."""
+    """Compress variables and functions names.
+
+    >>> slim('function foo( long_variable_name, bar ) { console.log(bar); };')
+    'function foo(__0,__1) { console.log(__1); };'
+    """
     log.debug("Obfuscating Javascript variables names inside functions.")
     # if eval() or with{} is used on JS is not too Safe to Obfuscate stuff.
     is_ok = "eval(" not in js and "with{" not in js and "with {" not in js
@@ -748,6 +759,8 @@ def prefixer_extensioner(file_path, old, new):
 
     This is needed because filepath.replace('.foo', '.bar') sometimes may
     replace '/folder.foo/file.foo' into '/folder.bar/file.bar' wrong!.
+    >>> prefixer_extensioner('/tmp/test.js', '.js', '.min.js')
+    '/tmp/test.min.js'
     """
     log.debug("Prepending Prefix to {}.".format(file_path))
     global args
