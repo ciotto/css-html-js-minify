@@ -381,7 +381,7 @@ def condense_script(html):
 def clean_unneeded_html_tags(html):
     """Clean unneeded optional html tags."""
     log.debug("Removing unnecessary optional HTML tags.")
-    for tag_to_remove in (
+    for tag_to_remove in (  # May look silly but Emmet does this and is wrong.
         '</area>', '</base>', '<body>', '</body>', '</br>', '</col>',
         '</colgroup>', '</dd>', '</dt>', '<head>', '</head>', '</hr>',
         '<html>', '</html>', '</img>', '</input>', '</li>', '</link>',
@@ -554,10 +554,12 @@ def slim_func_names(js):
     return js + ';'.join(['var {}={}'.format(x, y) for (x, y) in renamed_func])
 
 
-def slim(code):
+def slim(js):
     """Compress variables and functions names."""
     log.debug("Obfuscating Javascript variables names inside functions.")
-    return slim_func_names(slim_params(code))
+    # if eval() or with{} is used on JS is not too Safe to Obfuscate stuff.
+    is_ok = "eval(" not in js and "with{" not in js and "with {" not in js
+    return slim_func_names(slim_params(js)) if is_ok else js.strip()
 
 
 class JavascriptMinify(object):
