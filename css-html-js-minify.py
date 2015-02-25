@@ -358,7 +358,7 @@ def condense_html_whitespace(html):
 
     >>> condense_html_whitespace('<i>  <b>    <a> test </a>    </b> </i><br>')
     '<i><b><a> test </a></b></i><br>'
-    """
+    """  # first space between tags, then empty new lines and in-between.
     log.debug("Removing unnecessary HTML White Spaces and Empty New Lines.")
     is_ok = "<textarea" not in html.lower() and "<pre" not in html.lower()
     html = re.sub(r'>\s+<', '><', html) if is_ok else html
@@ -370,7 +370,7 @@ def condense_style(html):
 
     >>> condense_style('<style type="text/css">*{border:0}</style><p>a b c')
     '<style>*{border:0}</style><p>a b c'
-    """
+    """  # May look silly but Emmet does this and is wrong.
     log.debug("Condensing HTML Style CSS tags.")
     html = html.replace('<style type="text/css">', '<style>')
     html = html.replace("<style type='text/css'>", '<style>')
@@ -383,7 +383,7 @@ def condense_script(html):
 
     >>> condense_script('<script type="text/javascript"> </script><p>a b c')
     '<script> </script><p>a b c'
-    """
+    """  # May look silly but Emmet does this and is wrong.
     log.debug("Condensing HTML Script JS tags.")
     html = html.replace('<script type="text/javascript">', '<script>')
     html = html.replace("<style type='text/javascript'>", '<script>')
@@ -445,7 +445,7 @@ def unquote_html_attributes(html):
             continue
         original = tag
         # remove white space inside the tag itself
-        tag = space2.sub('" >', tag)
+        tag = space2.sub('" >', tag)  # preserve 1 white space is safer
         tag = space3.sub("' >", tag)
         for each in space1.findall(tag) + space6.findall(tag):
             tag = tag.replace(each, space.sub(' ', each))
