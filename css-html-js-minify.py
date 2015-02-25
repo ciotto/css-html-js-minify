@@ -925,7 +925,7 @@ def main():
     if args.checkupdates:
         check_for_updates()
     if args.tests:
-        testmod(verbose=True, report=True, exclude_empty=True)
+        testmod(verbose=True, report=True, exclude_empty=1, raise_on_error=1)
         sys.exit(0)
     if args.quiet:
         log.disable(log.CRITICAL)
