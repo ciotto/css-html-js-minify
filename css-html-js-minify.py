@@ -9,6 +9,7 @@ Unicode-ready Python3-ready Minifier for the Web.
 """
 
 
+import gzip
 import logging as log
 import os
 import re
@@ -17,11 +18,10 @@ from argparse import ArgumentParser
 from copy import copy
 from ctypes import byref, cdll, create_string_buffer
 from datetime import datetime
-from multiprocessing import cpu_count, Pool
-from tempfile import gettempdir
 from doctest import testmod
 from hashlib import sha1
-import gzip
+from multiprocessing import cpu_count, Pool
+from tempfile import gettempdir
 
 try:
     from urllib import request
@@ -485,8 +485,7 @@ def simple_replacer_js(js):
     """Force strip simple replacements from Javascript."""
     log.debug("Force strip simple replacements from Javascript.")
     return condense_semicolons(js.replace("debugger;", ";").replace(
-        ";}", "}").replace("; ", ";").replace(" ;", ";") .replace(
-            "{ ", "{").rstrip('\n;')).strip()
+        ";}", "}").replace("; ", ";").replace(" ;", ";").rstrip("\n;"))
 
 
 def jsmin(js):
