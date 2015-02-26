@@ -21,24 +21,24 @@ dependencies Unicode-ready Python3-ready Minifier for the Web.
 positional arguments:
     fullpath         Full path to local file or folder.
 
-    optional arguments:
-        -h, --help       show this help message and exit
-        --version        show program's version number and exit
-        --wrap           Wrap Output to ~80 chars per line, CSS Only.
-        --prefix PREFIX  Prefix string to prepend on output filenames.
-        --timestamp      Add a Time Stamp on all CSS/JS output files.
-        --quiet          Quiet, Silent, force disable all Logging.
-        --checkupdates   Check for Updates from Internet while running.
-        --tests          Run all built-in Unit Tests, report and exit.
-        --hash           Add SHA1 HEX-Digest 11chars Hash to Filenames.
-        --gzip           GZIP Minified files as '*.gz'. CSS/JS Only.
+optional arguments:
+    -h, --help       show this help message and exit
+    --version        show program's version number and exit
+    --wrap           Wrap Output to ~80 chars per line, CSS Only.
+    --prefix PREFIX  Prefix string to prepend on output filenames.
+    --timestamp      Add a Time Stamp on all CSS/JS output files.
+    --quiet          Quiet, Silent, force disable all Logging.
+    --checkupdates   Check for Updates from Internet while running.
+    --tests          Run all built-in Unit Tests, report and exit.
+    --hash           Add SHA1 HEX-Digest 11chars Hash to Filenames.
+    --gzip           GZIP Minified files as '*.gz'. CSS/JS Only.
 
-        CSS-HTML-JS-Minify:
-        Takes a file or folder full path string and process all CSS/HTML/JS found.
-        If argument is not file/folder will fail.
-        Check Updates works on Python3.
-        StdIn to StdOut is deprecated since may fail with unicode characters.
-        SHA1 HEX-Digest 11 Chars Hash on Filenames is used for Server Cache.
+CSS-HTML-JS-Minify:
+Takes a file or folder full path string and process all CSS/HTML/JS found.
+If argument is not file/folder will fail.
+Check Updates works on Python3.
+StdIn to StdOut is deprecated since may fail with unicode characters.
+SHA1 HEX-Digest 11 Chars Hash on Filenames is used for Server Cache.
 
 ```
 
