@@ -20,6 +20,8 @@ from datetime import datetime
 from multiprocessing import cpu_count, Pool
 from tempfile import gettempdir
 from doctest import testmod
+from hashlib import sha1
+import gzip
 
 try:
     from urllib import request
@@ -479,12 +481,20 @@ def htmlmin(html):
 # JS Minify
 
 
+def simple_replacer_js(js):
+    """Force strip simple replacements from Javascript."""
+    log.debug("Force strip simple replacements from Javascript.")
+    return condense_semicolons(js.replace("debugger;", ";").replace(
+        ";}", "}").replace("; ", ";").replace(" ;", ";") .replace(
+            "{ ", "{").rstrip('\n;')).strip()
+
+
 def jsmin(js):
     """Return a minified version of the Javascript string."""
     log.info("Compressing Javascript...")
-    ins, outs = StringIO(js.replace("debugger;", ";")), StringIO()
+    ins, outs = StringIO(js), StringIO()
     JavascriptMinify(ins, outs).minify()
-    return condense_semicolons(force_single_line_js(outs.getvalue()))
+    return force_single_line_js(outs.getvalue())
 
 
 def force_single_line_js(js):
@@ -761,7 +771,7 @@ def process_multiple_files(file_path):
         process_single_html_file(file_path)
 
 
-def prefixer_extensioner(file_path, old, new):
+def prefixer_extensioner(file_path, old, new, file_content=None):
     """Take a file path and safely prepend a prefix and change extension.
 
     This is needed because filepath.replace('.foo', '.bar') sometimes may
@@ -769,11 +779,14 @@ def prefixer_extensioner(file_path, old, new):
     >>> prefixer_extensioner('/tmp/test.js', '.js', '.min.js')
     '/tmp/test.min.js'
     """
-    log.debug("Prepending Prefix to {}.".format(file_path))
+    log.debug("Prepending '{}' Prefix to {}.".format(new, file_path))
     global args
     extension = os.path.splitext(file_path)[1].lower().replace(old, new)
     filenames = os.path.splitext(os.path.basename(file_path))[0]
     filenames = args.prefix + filenames if args.prefix else filenames
+    if args.hash and file_content:  # http://stackoverflow.com/a/25568916
+        filenames += "-" + sha1(file_content.encode("utf-8")).hexdigest()[:11]
+        log.debug("Appending SHA1 HEX-Digest Hash to '{}'.".format(file_path))
     dir_names = os.path.dirname(file_path)
     file_path = os.path.join(dir_names, filenames + extension)
     return file_path
@@ -785,20 +798,34 @@ def process_single_css_file(css_file_path):
     global args
     try:  # Python3
         with open(css_file_path, encoding="utf-8-sig") as css_file:
-            minified_css = cssmin(css_file.read(), wrap=80)
+            original_css = css_file.read()
+            minified_css = cssmin(original_css, wrap=80)
     except:  # Python2
         with open(css_file_path) as css_file:
-            minified_css = cssmin(css_file.read(), wrap=80)
+            original_css = css_file.read()
+            minified_css = cssmin(original_css, wrap=80)
     if args.timestamp:
         taim = "/* {} */ ".format(datetime.now().isoformat()[:-7].lower())
         minified_css = taim + minified_css
-    css_file_path = prefixer_extensioner(css_file_path, ".css", ".min.css")
+    min_css_file_path = prefixer_extensioner(
+        css_file_path, ".css", ".min.css", original_css)
+    if args.gzip:
+        gz_file_path = prefixer_extensioner(
+            css_file_path, ".css", ".min.css.gz", original_css)
     try:
-        with open(css_file_path, "w", encoding="utf-8") as output_file:
+        with open(min_css_file_path, "w", encoding="utf-8") as output_file:
             output_file.write(minified_css)
+        if args.gzip:
+            with gzip.open(gz_file_path, "wt", encoding="utf-8") as output_gz:
+                output_gz.write(minified_css)
+            log.debug("Saving GZIPed Minified file {}.".format(gz_file_path))
     except:
-        with open(css_file_path, "w") as output_file:
+        with open(min_css_file_path, "w") as output_file:
             output_file.write(minified_css)
+        if args.gzip:
+            with gzip.open(gz_file_path, "w") as output_gz:
+                output_gz.write(minified_css)
+            log.debug("Saving GZIPed Minified file {}.".format(gz_file_path))
 
 
 def process_single_html_file(html_file_path):
@@ -824,20 +851,34 @@ def process_single_js_file(js_file_path):
     log.info("Processing JS file: {}".format(js_file_path))
     try:  # Python3
         with open(js_file_path, encoding="utf-8-sig") as js_file:
-            minified_js = jsmin(slim(js_file.read()))
+            original_js = js_file.read()
+            minified_js = simple_replacer_js(jsmin(slim(original_js)))
     except:  # Python2
         with open(js_file_path) as js_file:
-            minified_js = jsmin(slim(js_file.read()))
+            original_js = js_file.read()
+            minified_js = simple_replacer_js(jsmin(slim(original_js)))
     if args.timestamp:
         taim = "/* {} */ ".format(datetime.now().isoformat()[:-7].lower())
         minified_js = taim + minified_js
-    js_file_path = prefixer_extensioner(js_file_path, ".js", ".min.js")
+    min_js_file_path = prefixer_extensioner(
+        js_file_path, ".js", ".min.js", original_js)
+    if args.gzip:
+        gz_file_path = prefixer_extensioner(
+            js_file_path, ".js", ".min.js.gz", original_js)
     try:  # Python3
-        with open(js_file_path, "w", encoding="utf-8") as output_file:
+        with open(min_js_file_path, "w", encoding="utf-8") as output_file:
             output_file.write(minified_js)
+        if args.gzip:
+            with gzip.open(gz_file_path, "wt", encoding="utf-8") as output_gz:
+                output_gz.write(minified_js)
+            log.debug("Saving GZIPed Minified file {}.".format(gz_file_path))
     except:  # Python2
-        with open(js_file_path, "w") as output_file:
+        with open(min_js_file_path, "w") as output_file:
             output_file.write(minified_js)
+        if args.gzip:
+            with gzip.open(gz_file_path, "w") as output_gz:
+                output_gz.write(minified_js)
+            log.debug("Saving GZIPed Minified file {}.".format(gz_file_path))
 
 
 def check_for_updates():
@@ -903,7 +944,8 @@ def main():
     parser = ArgumentParser(description=__doc__, epilog="""CSS-HTML-JS-Minify:
     Takes a file or folder full path string and process all CSS/HTML/JS found.
     If argument is not file/folder will fail. Check Updates works on Python3.
-    StdIn to StdOut is deprecated since may fail with unicode characters.""")
+    StdIn to StdOut is deprecated since may fail with unicode characters.
+    SHA1 HEX-Digest 11 Chars Hash on Filenames is used for Server Cache.""")
     parser.add_argument('--version', action='version', version=__version__)
     parser.add_argument('fullpath', metavar='fullpath', type=str,
                         help='Full path to local file or folder.')
@@ -914,11 +956,15 @@ def main():
     parser.add_argument('--timestamp', action='store_true',
                         help="Add a Time Stamp on all CSS/JS output files.")
     parser.add_argument('--quiet', action='store_true',
-                        help="Quiet, force disable all Logging.")
+                        help="Quiet, Silent, force disable all Logging.")
     parser.add_argument('--checkupdates', action='store_true',
                         help="Check for Updates from Internet while running.")
     parser.add_argument('--tests', action='store_true',
                         help="Run all built-in Unit Tests, report and exit.")
+    parser.add_argument('--hash', action='store_true',
+                        help="Add SHA1 HEX-Digest 11chars Hash to Filenames.")
+    parser.add_argument('--gzip', action='store_true',
+                        help="GZIP Minified files as '*.gz'. CSS/JS Only.")
     global args
     args = parser.parse_args()
     if args.checkupdates:
