@@ -229,8 +229,8 @@ def condense_floating_points(css):
 def condense_hex_colors(css):
     """Shorten colors from #AABBCC to #ABC where possible."""
     log.debug("Condensing all hexadecimal color values.")
-    regex = re.compile(r"([^\"'=\s])(\s*)#([0-9a-fA-F])([0-9a-fA-F])"
-                       "([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])")
+    regex = re.compile(r"""([^\"'=\s])(\s*)#([0-9a-f])([0-9a-f])([0-9a-f])"""
+        + r"([0-9a-f])([0-9a-f])([0-9a-f])", re.I | re.S)
     match = regex.search(css)
     while match:
         first = match.group(3) + match.group(5) + match.group(7)
@@ -279,9 +279,10 @@ def condense_font_weight(css):
 def condense_std_named_colors(css):
     """Condense named color values to shorter replacement using HEX."""
     log.debug("Condensing standard named color values.")
-    for k, v in iter(tuple({'aqua': '#0ff', 'blue': '#00f',
-                            'fuchsia': '#f0f', 'yellow': '#ff0'}.items())):
-        css = css.replace(k, v)
+    for color_name, color_hexa in iter(tuple({
+        ':aqua;': ':#0ff;', ':blue;': ':#00f;',
+        ':fuchsia;': ':#f0f;', ':yellow;': ':#ff0;'}.items())):
+        css = css.replace(color_name, color_hexa)
     return css
 
 
@@ -315,8 +316,9 @@ def add_encoding(css):
 
 def restore_needed_space(css):
     """Fix CSS for some specific cases where a white space is needed."""
-    return css.replace("!important", " !important"
-                       ).replace("@media(", "@media (")
+    return css.replace("!important", " !important").replace(  # !important
+        "@media(", "@media (").replace(  # media queries # jpeg > jpg
+            "data:image/jpeg;base64,", "data:image/jpg;base64,").rstrip("\n;")
 
 
 def unquote_selectors(css):
@@ -333,9 +335,9 @@ def cssmin(css, wrap=None):
     css = condense_whitespace(css)
     css = remove_url_quotes(css)
     css = condense_xtra_named_colors(css)
-    css = condense_std_named_colors(css)
     css = condense_font_weight(css)
     css = remove_unnecessary_whitespace(css)
+    css = condense_std_named_colors(css)
     css = remove_unnecessary_semicolons(css)
     css = condense_zero_units(css)
     css = condense_multidimensional_zeros(css)
