@@ -91,16 +91,51 @@ css-html-js-minify
 - **Why another Compressor ?**, theres lots of Compressor for Web files outthere!; *Or maybe not ?*.
 - Lots work inside DJango/Flask only, or Frameworks of PHP/Java/Ruby, or can Not process whole folders.
 
-| Name | Reason |
-| ---- | ------ |
-| [YUI-Compressor](www.yuiblog.com/blog/2012/10/16/state-of-yui-compressor) | Deprecated, Needs Java, Dead since ~2012, No HTML Minification, Complex to Install |
-| [UglifyJS](https://github.com/mishoo/UglifyJS2) | Needs NodeJS, No HTML/CSS Minification, Cant process whole folders, Slow |
-| [Slimmer](https://pypi.python.org/pypi/slimmer) | Python2 Only, No Unicode/UTF-8 Support, Dead since ~2009 |
-| [CSSMin](https://pypi.python.org/pypi/cssmin) | No Unicode/UTF-8 Support, Dead since ~2013, No HTML/JS Minification, Cant process whole folders |
-| [django-cssmin](https://github.com/zacharyvoase/django-cssmin) | Uses CSSMin which is Dead, DJango only, No HTML/JS Minification |
-| [SlimIt](https://pypi.python.org/pypi/slimit) | JS Only, to use as RunTime Module, Dead sincec ~2013, Cant process whole folders |
-| [JSMin](https://pypi.python.org/pypi/jsmin) | JS Only, Cant process whole folders |
-| All On-Line Minifiers | Cant process whole folders, Slow, No Unicode/UTF-8 Support usually |
+
+**Input CSS:**
+```css
+
+
+/*!
+ * preserve commment
+ */
+
+
+/* delete comment */
+.class, #NotHex, input[type="text"], a:hover  {
+    font-family : Helvetica Neue, Arial, Helvetica, 'Liberation Sans', sans-serif;
+    border: none;
+    margin: 0 0 0 0;
+    border-color:    fuchsia;
+    color:           mediumspringgreen;
+    background-position:0 0;;
+    transform-origin:0 0;
+    margin: 0px !important;
+    font-weight :bold;
+    color: rgb( 255, 255, 255 );
+    padding : 0.9px;
+    position : absolute;
+    z-index : 100000;
+    color: #000000;
+    background-color: #FFFFFF;
+    background-image: url("data:image/jpeg;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=");
+;}
+
+;;
+
+```
+
+**Uglify (NodeJS):** *(474 Bytes, 0.189 Secs)*
+
+```css
+/* * preserve commment */ .class,#NotHex,input[type="text"],a:hover {font-family:Helvetica Neue,Arial,Helvetica,'Liberation Sans',sans-serif;border:0;margin:0;border-color:fuchsia;color:mediumspringgreen;background-position:0 0;transform-origin:0 0;margin:0 !important;font-weight:bold;color:#fff;padding:.9px;position:absolute;z-index:100000;color:#000;background-color:#fff;background-image:url("data:image/jpeg;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=")};
+```
+
+**css-html-js-minify (Python3):** *(469 Bytes, 0.010 Secs)*
+
+```css
+/*!* preserve commment */ .class,#NotHex,input[type=text],a:hover{font-family:Helvetica Neue,Arial,Helvetica,'Liberation Sans',sans-serif;border:0;margin:0;border-color:#f0f;color:#00fa9a;background-position:0 0;transform-origin:0 0;margin:0 !important;font-weight:700;color:#fff;padding:.9px;position:absolute;z-index:100000;color:#000;background-color:#FFF;background-image:url(data:image/jpg;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=)}
+```
 
 
 # Requisites:
