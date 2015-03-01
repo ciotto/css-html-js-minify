@@ -148,6 +148,11 @@ css-html-js-minify
 - Lint, PEP-8, PEP-257, PyLama must Pass Ok. `pip install pep8 pep257 pylama`
 
 
+# Contributors:
+
+- **Ad-Hocracy Meritocracy**: >= 3 Pull Requests Merged on Master you become Repo Admin.
+
+
 # Licence:
 
 - GNU GPL Latest Version *AND* GNU LGPL Latest Version *AND* any Licence YOU Request via Bug Report.
