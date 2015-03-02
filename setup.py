@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 
@@ -30,17 +30,6 @@ def find_this(search, filename=MODULE_PATH):
             return line
 
 
-def github_markdown_to_restructuredtext(filename='README.md'):
-    """Convert github markdown to restructured text on the fly."""
-    if convert:
-        restructured_text = convert(filename, 'rst',
-                                    format='md', encoding="utf-8")
-    else:
-        with open(filename) as github_markdown:
-            restructured_text = github_markdown.read().strip()
-    return restructured_text
-
-
 setup(
 
     name="css-html-js-minify",
@@ -48,7 +37,9 @@ setup(
 
     description=("StandAlone Async single-file cross-platform no-dependencies"
                  " Unicode-ready Python3-ready Minifier for the Web."),
-    long_description=github_markdown_to_restructuredtext(),
+
+    setup_requires=['setuptools-markdown'],  # pip3 install setuptools-markdown
+    long_description_markdown_filename='README.md',
 
     url=find_this("__url__"),
     license=find_this("__license__"),
