@@ -1,8 +1,9 @@
 css-html-js-minify
 ==================
 
-|Travis report| |GPL License| |LGPL License| |Python Version| |Join the
-chat at https://gitter.im/juancarlospaco/css-html-js-minify| |Donate|
+|Travis report| |GPL License| |LGPL License| |Python Version| |PyPI|
+|Join the chat at https://gitter.im/juancarlospaco/css-html-js-minify|
+|Donate|
 
 -  **StandAlone Async single-file cross-platform no-dependencies
    Unicode-ready Python3-ready Minifier for the Web.**
@@ -200,6 +201,8 @@ Donate, Charityware :
    :target: http://opensource.org/licenses/LGPL-3.0
 .. |Python Version| image:: https://img.shields.io/badge/Python-3-brightgreen.svg?style=plastic
    :target: http://python.org
+.. |PyPI| image:: https://pypip.in/v/css-html-js-minify/badge.png
+   :target: https://pypi.python.org/pypi/pip-init
 .. |Join the chat at https://gitter.im/juancarlospaco/css-html-js-minify| image:: https://badges.gitter.im/Join%20Chat.svg
    :target: https://gitter.im/juancarlospaco/css-html-js-minify?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 .. |Donate| image:: https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif
