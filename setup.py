@@ -9,6 +9,11 @@ import os
 
 from setuptools import setup
 
+try:
+    from pypandoc import convert
+except ImportError:
+    convert = None
+
 
 MODULE_PATH = os.path.join(os.getcwd(), "css-html-js-minify.py")
 
@@ -25,13 +30,23 @@ def find_this(search, filename=MODULE_PATH):
             return line
 
 
+def github_markdown_to_restructuredtext(filename='README.md'):
+    """Convert github markdown to restructured text on the fly."""
+    if convert:
+        restructured_text = convert(filename, 'rst')
+    else:
+        with open(filename) as github_markdown:
+            restructured_text = github_markdown.read().strip()
+    return restructured_text
+
+
 setup(
 
     name="css-html-js-minify",
     version=find_this("__version__"),
 
     description=find_this("__description__"),
-    long_description=(open('README.rst').read().strip()),
+    long_description=github_markdown_to_restructuredtext(),
 
     url=find_this("__url__"),
     license=find_this("__licence__"),
