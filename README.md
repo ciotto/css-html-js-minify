@@ -151,7 +151,7 @@ css-html-js-minify
 
 # Coding Style Guide:
 
-- Lint, PEP-8, PEP-257, PyLama must Pass Ok. `pip install pep8 pep257 pylama`
+- Lint, PEP-8, PEP-257, PyLama, iSort must Pass Ok. `pip install pep8 pep257 pylama isort`
 
 
 # Contributors:
