@@ -37,7 +37,8 @@ except ImportError:
     resource = None  # windows dont have resource
 
 
-__version__ = '1.0.0'
+__version__ = "1.0.0"
+__description = " ".join(__doc__.splitlines())
 __license__ = 'GPLv3+ LGPLv3+'
 __author__ = 'Juan Carlos'
 __email__ = 'juancarlospaco@gmail.com'
