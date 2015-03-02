@@ -37,14 +37,13 @@ except ImportError:
     resource = None  # windows dont have resource
 
 
-__version__ = "1.0.0"
-__description = " ".join(__doc__.splitlines())
-__license__ = 'GPLv3+ LGPLv3+'
-__author__ = 'Juan Carlos'
-__email__ = 'juancarlospaco@gmail.com'
-__url__ = 'https://github.com/juancarlospaco/css-html-js-minify'
-__source__ = ('https://raw.githubusercontent.com/juancarlospaco/'
-              'css-html-js-minify/master/css-html-js-minify.py')
+__version__ = "1.0.6"
+__license__ = "GPLv3+ LGPLv3+"
+__author__ = "Juan Carlos"
+__email__ = "juancarlospaco@gmail.com"
+__url__ = "https://github.com/juancarlospaco/css-html-js-minify"
+__source__ = ("https://raw.githubusercontent.com/juancarlospaco/"
+              "css-html-js-minify/master/css-html-js-minify.py")
 
 
 start_time = datetime.now()

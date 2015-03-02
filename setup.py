@@ -19,21 +19,22 @@ MODULE_PATH = os.path.join(os.getcwd(), "css-html-js-minify.py")
 
 
 def find_this(search, filename=MODULE_PATH):
-    """Take a REGEX and a filename path string and return the found value."""
+    """Take a string and a filename path string and return the found value."""
     if not search:
         return
     for line in open(str(filename)).readlines():
         if search in line:
             line = line.split("=")[1].strip()
-            if search in "__version__":
-                return line.replace("'", "").replace('"', '')
+            if "'" in line or '"' in line or '"""' in line:
+                line = line.replace("'", "").replace('"', '').replace('"""', '')
             return line
 
 
 def github_markdown_to_restructuredtext(filename='README.md'):
     """Convert github markdown to restructured text on the fly."""
     if convert:
-        restructured_text = convert(filename, 'rst')
+        restructured_text = convert(filename, 'rst',
+                                    format='md', encoding="utf-8")
     else:
         with open(filename) as github_markdown:
             restructured_text = github_markdown.read().strip()
@@ -45,11 +46,12 @@ setup(
     name="css-html-js-minify",
     version=find_this("__version__"),
 
-    description=find_this("__description__"),
+    description=("StandAlone Async single-file cross-platform no-dependencies"
+                 " Unicode-ready Python3-ready Minifier for the Web."),
     long_description=github_markdown_to_restructuredtext(),
 
     url=find_this("__url__"),
-    license=find_this("__licence__"),
+    license=find_this("__license__"),
 
     author=find_this("__author__"),
     author_email=find_this("__email__"),
@@ -58,11 +60,17 @@ setup(
 
     include_package_data=True,
     zip_safe=True,
+    install_requires=['pip'],
+    requires=['pip'],
 
     scripts=["css-html-js-minify.py"],
     entry_points = {
         'console_scripts': ['css-html-js-minify = css_html_js_minify']
     },
+
+    keywords=['CSS', 'HTML', 'JS', 'Compressor', 'CSS3', 'HTML5', 'Web',
+              'Javascript', 'Minifier', 'Minify', 'Uglify', 'Obfuscator',
+    ],
 
     classifiers=[
         'Development Status :: 5 - Production/Stable',
