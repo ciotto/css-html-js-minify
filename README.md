@@ -79,6 +79,12 @@ css-html-js-minify.py /project/static/
 
 # Install permanently on the system:
 
+**PIP:**
+```
+sudo pip3 install css-html-js-minify
+```
+
+**WGET:**
 ```
 sudo wget -O /usr/bin/css-html-js-minify https://raw.githubusercontent.com/juancarlospaco/css-html-js-minify/master/css-html-js-minify.py
 sudo chmod +x /usr/bin/css-html-js-minify
