@@ -10,10 +10,10 @@ import os
 from setuptools import setup
 
 
-MODULE_RELATIVE_PATH = os.path.join(os.getcwd(), "css-html-js-minify.py")
+MODULE_PATH = os.path.join(os.getcwd(), "css-html-js-minify.py")
 
 
-def find_this(search, filename=MODULE_RELATIVE_PATH):
+def find_this(search, filename=MODULE_PATH):
     """Take a REGEX and a filename path string and return the found value."""
     if not search:
         return
