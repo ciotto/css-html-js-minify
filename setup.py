@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+#
+# To Upload to PyPI by executing:  python3 setup.py sdist upload -r pypi
 
 
 """Setup.py for Python Wheels, as Generic as possible."""
@@ -18,7 +20,7 @@ def find_this(search, filename=MODULE_PATH):
     if not search:
         return
     for line in open(str(filename)).readlines():
-        if search in line:
+        if search.lower() in line.lower():
             line = line.split("=")[1].strip()
             if "'" in line or '"' in line or '"""' in line:
                 line = line.replace("'", "").replace('"', '').replace('"""', '')
