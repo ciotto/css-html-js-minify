@@ -12,8 +12,10 @@ css-html-js-minify.py --help
 
 usage: css-html-js-minify.py [-h] [--version] [--wrap] [--prefix PREFIX]
 [--timestamp] [--quiet] [--checkupdates]
-[--tests] [--hash] [--gzip]
+[--tests] [--hash] [--gzip] [--comments]
+[--overwrite]
 fullpath
+
 
 CSS-HTML-JS-Minify. StandAlone Async single-file cross-platform no-
 dependencies Unicode-ready Python3-ready Minifier for the Web.
@@ -32,6 +34,9 @@ optional arguments:
     --tests          Run all built-in Unit Tests, report and exit.
     --hash           Add SHA1 HEX-Digest 11chars Hash to Filenames.
     --gzip           GZIP Minified files as '*.gz'. CSS/JS Only.
+    --comments       Keep Comments, CSS/HTML Only.
+    --overwrite      Force overwrite all in-place (Not Recommended)
+
 
 CSS-HTML-JS-Minify:
 Takes a file or folder full path string and process all CSS/HTML/JS found.
