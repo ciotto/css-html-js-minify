@@ -30,6 +30,7 @@ script:
     - $TRAVIS_BUILD_DIR/css-html-js-minify.py --prefix temp_ --timestamp $TRAVIS_BUILD_DIR/jquery-git2.js
     - wget https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.css
     - $TRAVIS_BUILD_DIR/css-html-js-minify.py --prefix temp_ --timestamp --wrap $TRAVIS_BUILD_DIR/bootstrap.css
+    - pip install --upgrade --no-compile --allow-all-external css-html-js-minify
     - $TRAVIS_BUILD_DIR/css-html-js-minify.py --tests true
 
 
