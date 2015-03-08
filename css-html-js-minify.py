@@ -37,7 +37,7 @@ except ImportError:
     resource = None  # windows dont have resource
 
 
-__version__ = "1.0.6"
+__version__ = "1.0.7"
 __license__ = "GPLv3+ LGPLv3+"
 __author__ = "Juan Carlos"
 __email__ = "juancarlospaco@gmail.com"
@@ -327,10 +327,10 @@ def unquote_selectors(css):
     return re.compile('([a-zA-Z]+)="([a-zA-Z0-9-_\.]+)"]').sub(r'\1=\2]', css)
 
 
-def cssmin(css, wrap=None):
+def cssmin(css, wrap=None, comments=False):
     """Minify CSS main function."""
     log.info("Compressing CSS...")
-    css = remove_comments(css)
+    css = remove_comments(css) if not comments else css
     css = unquote_selectors(css)
     css = condense_whitespace(css)
     css = remove_url_quotes(css)
@@ -462,14 +462,14 @@ def unquote_html_attributes(html):
     return html.strip()
 
 
-def htmlmin(html):
+def htmlmin(html, comments=False):
     """Minify HTML main function.
 
     >>> htmlmin(' <p  width="9" height="5"  > <!-- a --> b </p> c <br> ')
     '<p width=9 height=5 > b c <br>'
     """
     log.info("Compressing HTML...")
-    html = remove_html_comments(html)
+    html = remove_html_comments(html) if not comments else html
     html = condense_style(html)
     html = condense_script(html)
     html = clean_unneeded_html_tags(html)
@@ -800,19 +800,22 @@ def process_single_css_file(css_file_path):
     try:  # Python3
         with open(css_file_path, encoding="utf-8-sig") as css_file:
             original_css = css_file.read()
-            minified_css = cssmin(original_css, wrap=80)
+            minified_css = cssmin(original_css, wrap=80, comments=args.comments)
     except:  # Python2
         with open(css_file_path) as css_file:
             original_css = css_file.read()
-            minified_css = cssmin(original_css, wrap=80)
+            minified_css = cssmin(original_css, wrap=80, comments=args.comments)
     if args.timestamp:
         taim = "/* {} */ ".format(datetime.now().isoformat()[:-7].lower())
         minified_css = taim + minified_css
     min_css_file_path = prefixer_extensioner(
-        css_file_path, ".css", ".min.css", original_css)
+        css_file_path, ".css", ".css" if args.overwrite else ".min.css",
+        original_css)
     if args.gzip:
         gz_file_path = prefixer_extensioner(
-            css_file_path, ".css", ".min.css.gz", original_css)
+            css_file_path,
+            ".css", ".css.gz" if args.overwrite else ".min.css.gz",
+            original_css)
     try:
         with open(min_css_file_path, "w", encoding="utf-8") as output_file:
             output_file.write(minified_css)
@@ -834,10 +837,10 @@ def process_single_html_file(html_file_path):
     log.info("Processing HTML file: {}".format(html_file_path))
     try:  # Python3
         with open(html_file_path, encoding="utf-8-sig") as html_file:
-            minified_html = htmlmin(html_file.read())
+            minified_html = htmlmin(html_file.read(), comments=args.comments)
     except:  # Python2
         with open(html_file_path) as html_file:
-            minified_html = htmlmin(html_file.read())
+            minified_html = htmlmin(html_file.read(), comments=args.comments)
     html_file_path = prefixer_extensioner(html_file_path, ".htm", ".html")
     try:  # Python3
         with open(html_file_path, "w", encoding="utf-8") as output_file:
@@ -862,10 +865,12 @@ def process_single_js_file(js_file_path):
         taim = "/* {} */ ".format(datetime.now().isoformat()[:-7].lower())
         minified_js = taim + minified_js
     min_js_file_path = prefixer_extensioner(
-        js_file_path, ".js", ".min.js", original_js)
+        js_file_path, ".js", ".js" if args.overwrite else ".min.js",
+        original_js)
     if args.gzip:
         gz_file_path = prefixer_extensioner(
-            js_file_path, ".js", ".min.js.gz", original_js)
+            js_file_path, ".js", ".js.gz" if args.overwrite else ".min.js.gz",
+            original_js)
     try:  # Python3
         with open(min_js_file_path, "w", encoding="utf-8") as output_file:
             output_file.write(minified_js)
@@ -965,7 +970,11 @@ def main():
     parser.add_argument('--hash', action='store_true',
                         help="Add SHA1 HEX-Digest 11chars Hash to Filenames.")
     parser.add_argument('--gzip', action='store_true',
-                        help="GZIP Minified files as '*.gz'. CSS/JS Only.")
+                        help="GZIP Minified files as '*.gz', CSS/JS Only.")
+    parser.add_argument('--comments', action='store_true',
+                        help="Keep Comments, CSS/HTML Only.")
+    parser.add_argument('--overwrite', action='store_true',
+                        help="Force overwrite all in-place (Not Recommended)")
     global args
     args = parser.parse_args()
     if args.checkupdates:
@@ -981,7 +990,8 @@ def main():
         log.info("Target is a CSS File.")
         list_of_files = str(args.fullpath)
         process_single_css_file(args.fullpath)
-    elif os.path.isfile(args.fullpath) and args.fullpath.endswith(".htm"):
+    elif os.path.isfile(args.fullpath
+                        ) and args.fullpath.endswith((".htm", ".html")):
         log.info("Target is a HTML File.")
         list_of_files = str(args.fullpath)
         process_single_html_file(args.fullpath)
@@ -992,9 +1002,10 @@ def main():
     elif os.path.isdir(args.fullpath):
         log.info("Target is a Folder with CSS, HTML, JS.")
         log.warning("Processing a whole Folder may take some time...")
-        list_of_files = walkdir_to_filelist(args.fullpath,
-                                            (".css", ".js", ".htm"),
-                                            (".min.css", ".min.js", ".html"))
+        list_of_files = walkdir_to_filelist(
+            args.fullpath,
+            (".css", ".js", ".html" if args.overwrite else ".htm"),
+            tuple() if args.overwrite else (".min.css", ".min.js", ".htm"))
         pool = Pool(cpu_count())  # Multiprocessing Async
         pool.map_async(process_multiple_files, list_of_files)
         pool.close()

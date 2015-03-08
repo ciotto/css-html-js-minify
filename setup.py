@@ -9,11 +9,6 @@ import os
 
 from setuptools import setup
 
-try:
-    from pypandoc import convert
-except ImportError:
-    convert = None
-
 
 MODULE_PATH = os.path.join(os.getcwd(), "css-html-js-minify.py")
 
