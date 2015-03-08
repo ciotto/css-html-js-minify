@@ -33,9 +33,6 @@ setup(
     description=("StandAlone Async single-file cross-platform no-dependencies"
                  " Unicode-ready Python3-ready Minifier for the Web."),
 
-    setup_requires=['setuptools-markdown'],  # pip3 install setuptools-markdown
-    long_description_markdown_filename='README.md' if os.path.isfile('README.md') else '',
-
     url=find_this("__url__"),
     license=find_this("__license__"),
 
