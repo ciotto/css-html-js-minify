@@ -10,6 +10,7 @@ Unicode-ready Python3-ready Minifier for the Web.
 
 
 import gzip
+import itertools
 import logging as log
 import os
 import re
@@ -104,10 +105,170 @@ EXTENDED_NAMED_COLORS = {
     'turquoise': (64, 224, 208), 'violet': (238, 130, 238),
     'wheat': (245, 222, 179)
 }
+CSS_PROPS_TEXT = '''
+alignment-adjust alignment-baseline animation animation-delay
+animation-direction animation-duration animation-iteration-count
+animation-name animation-play-state animation-timing-function appearance
+azimuth
+
+backface-visibility background background-attachment background-clip
+background-color background-image background-origin background-position
+background-repeat background-size baseline-shift bikeshedding bookmark-label
+bookmark-level bookmark-state bookmark-target border border-bottom
+border-bottom-color border-bottom-left-radius border-bottom-right-radius
+border-bottom-style border-bottom-width border-collapse border-color
+border-image border-image-outset border-image-repeat border-image-slice
+border-image-source border-image-width border-left border-left-color
+border-left-style border-left-width border-radius border-right
+border-right-color border-right-style border-right-width border-spacing
+border-style border-top border-top-color border-top-left-radius
+border-top-right-radius border-top-style border-top-width border-width bottom
+box-decoration-break box-shadow box-sizing
+
+caption-side clear clip color column-count column-fill column-gap column-rule
+column-rule-color column-rule-style column-rule-width column-span column-width
+columns content counter-increment counter-reset cue cue-after cue-before
+cursor
+
+direction display drop-initial-after-adjust drop-initial-after-align
+drop-initial-before-adjust drop-initial-before-align drop-initial-size
+drop-initial-value
+
+elevation empty-cells
+
+fit fit-position float font font-family font-size font-size-adjust
+font-stretch font-style font-variant font-weight
+
+grid-columns grid-rows
+
+hanging-punctuation height hyphenate-character hyphenate-resource hyphens
+
+icon image-orientation image-resolution inline-box-align
+
+left letter-spacing line-height line-stacking line-stacking-ruby
+line-stacking-shift line-stacking-strategy linear-gradient list-style
+list-style-image list-style-position list-style-type
+
+margin margin-bottom margin-left margin-right margin-top marquee-direction
+marquee-loop marquee-speed marquee-style max-height max-width min-height
+min-width
+
+nav-index
+
+opacity orphans outline outline-color outline-offset outline-style
+outline-width overflow overflow-style overflow-x overflow-y
+
+padding padding-bottom padding-left padding-right padding-top page
+page-break-after page-break-before page-break-inside pause pause-after
+pause-before perspective perspective-origin pitch pitch-range play-during
+position presentation-level
+
+quotes
+
+resize rest rest-after rest-before richness right rotation rotation-point
+ruby-align ruby-overhang ruby-position ruby-span
+
+size speak speak-header speak-numeral speak-punctuation speech-rate src
+stress string-set
+
+table-layout target target-name target-new target-position text-align
+text-align-last text-decoration text-emphasis text-indent text-justify
+text-outline text-shadow text-transform text-wrap top transform
+transform-origin transition transition-delay transition-duration
+transition-property transition-timing-function
+
+unicode-bidi unicode-range
+
+vertical-align visibility voice-balance voice-duration voice-family
+voice-pitch voice-range voice-rate voice-stress voice-volume volume
+
+white-space widows width word-break word-spacing word-wrap
+
+z-index
+'''
 
 
 ###############################################################################
 # CSS minify
+
+
+def _compile_props(props_text):
+    """Take a list of props and prepare them."""
+    props = []
+    for line_of_props in props_text.strip().lower().splitlines():
+        props += line_of_props.split(" ")
+    props = filter(lambda line: not line.startswith('#'), props)
+    final_props, groups, g_id = [], [], 0
+    for prop in props:
+        if prop.strip():
+            final_props.append(prop)
+            groups.append(g_id)
+        else:
+            g_id += 1
+    return final_props, groups
+
+
+def _prioritify(line_buffer, pgs):
+    """Return args priority, priority is integer and smaller means higher."""
+    props, groups = pgs
+    priority, group = 9999, 0
+    for css_property in props:
+        if line_buffer.find(css_property + ':') != -1:
+            priority = props.index(css_property)
+            group = groups[priority]
+            break
+    return priority, group
+
+
+def _props_grouper(props, pgs):
+    """Return groups for properties."""
+    if not props:
+        return props
+    props = [_
+             if _.strip().endswith(";") else _.rstrip() + ";\n" for _ in props]
+    props_pg = zip(map(lambda prop: _prioritify(prop, pgs), props), props)
+    props_pg = sorted(props_pg, key=lambda item: item[0][1])
+    props_by_groups = map(
+        lambda item: list(item[1]),
+        itertools.groupby(props_pg, key=lambda item: item[0][1]))
+    props_by_groups = map(lambda item: sorted(
+        item, key=lambda item: item[0][0]), props_by_groups)
+    props = []
+    for group in props_by_groups:
+        group = map(lambda item: item[1], group)
+        props += group
+        props += ['\n']
+    props.pop()
+    return props
+
+
+def sort_properties(css_unsorted_string):
+    """CSS Property Sorter Function.
+
+    This function will read buffer argument, split it to a list by lines,
+    sort it by defined rule, and return sorted buffer if it's CSS property.
+    This function depends on '_prioritify' function.
+    """
+    log.debug("Alphabetically Sorting and Grouping all CSS Properties.")
+    css_pgs = _compile_props(CSS_PROPS_TEXT)
+    pattern = re.compile(r'(.*?{\r?\n?)(.*?)(}.*?)|(.*)',
+                         re.DOTALL + re.MULTILINE)
+    matched_patterns = pattern.findall(css_unsorted_string)
+    sorted_patterns, sorted_buffer = [], css_unsorted_string
+    RE_prop = re.compile(r'((?:.*?)(?:;)(?:.*?\n)|(?:.*))',
+                         re.DOTALL + re.MULTILINE)
+    if len(matched_patterns) != 0:
+        for matched_groups in matched_patterns:
+            sorted_patterns += matched_groups[0].splitlines(True)
+            props = map(lambda line: line.lstrip('\n'),
+                        RE_prop.findall(matched_groups[1]))
+            props = list(filter(lambda line: line.strip('\n '), props))
+            props = _props_grouper(props, css_pgs)
+            sorted_patterns += props
+            sorted_patterns += matched_groups[2].splitlines(True)
+            sorted_patterns += matched_groups[3].splitlines(True)
+        sorted_buffer = ''.join(sorted_patterns)
+    return sorted_buffer
 
 
 def remove_comments(css):
@@ -257,7 +418,7 @@ def condense_semicolons(css):
     return re.sub(r";;+", ";", css)
 
 
-def wrap_css_lines(css, line_length):
+def wrap_css_lines(css, line_length=80):
     """Wrap the lines of the given CSS to an approximate length."""
     log.debug("Wrapping lines to ~{} max line lenght.".format(line_length))
     lines, line_start = [], 0
@@ -328,10 +489,11 @@ def unquote_selectors(css):
     return re.compile('([a-zA-Z]+)="([a-zA-Z0-9-_\.]+)"]').sub(r'\1=\2]', css)
 
 
-def cssmin(css, wrap=None, comments=False):
+def css_minify(css, wrap=False, comments=False):
     """Minify CSS main function."""
     log.info("Compressing CSS...")
     css = remove_comments(css) if not comments else css
+    css = sort_properties(css)
     css = unquote_selectors(css)
     css = condense_whitespace(css)
     css = remove_url_quotes(css)
@@ -346,7 +508,7 @@ def cssmin(css, wrap=None, comments=False):
     css = normalize_rgb_colors_to_hex(css)
     css = condense_hex_colors(css)
     css = condense_border_none(css)
-    css = wrap_css_lines(css, wrap) if wrap is not None else css
+    css = wrap_css_lines(css, 80) if wrap else css
     css = condense_semicolons(css)
     css = add_encoding(css)
     css = restore_needed_space(css)
@@ -463,10 +625,10 @@ def unquote_html_attributes(html):
     return html.strip()
 
 
-def htmlmin(html, comments=False):
+def html_minify(html, comments=False):
     """Minify HTML main function.
 
-    >>> htmlmin(' <p  width="9" height="5"  > <!-- a --> b </p> c <br> ')
+    >>> html_minify(' <p  width="9" height="5"  > <!-- a --> b </p> c <br> ')
     '<p width=9 height=5 > b c <br>'
     """
     log.info("Compressing HTML...")
@@ -491,7 +653,7 @@ def simple_replacer_js(js):
         ";}", "}").replace("; ", ";").replace(" ;", ";").rstrip("\n;"))
 
 
-def jsmin(js):
+def js_minify(js):
     """Return a minified version of the Javascript string."""
     log.info("Compressing Javascript...")
     ins, outs = StringIO(js), StringIO()
@@ -510,7 +672,7 @@ function_start_regex = re.compile('(function[ \w+\s*]\(([^\)]*)\)\s*{)')
 function_start_regex = re.compile('(function(\s+\w+|)\s*\(([^\)]*)\)\s*{)')
 
 
-def _findFunctions(whole):
+def _find_functions(whole):
     """Find function() on Javascript code."""
     for res in function_start_regex.findall(whole):
         function_start, function_name, params = res
@@ -538,7 +700,7 @@ def slim_params(code):
     'function f(_0,_1){_0*_1}'
     """
     old_functions, new_code = {}, code
-    for params, params_split, core, function_start in _findFunctions(code):
+    for params, params_split, core, function_start in _find_functions(code):
         params_split_use = [x for x in params_split if len(x) > 1]
         _param_regex = '|'.join([r'\b%s\b' % x for x in params_split_use])
         param_regex, new_params = re.compile(_param_regex), {}
@@ -610,11 +772,11 @@ def slim_func_names(js):
     return js + js_function_name_replacements
 
 
-def slim(js):
+def js_minify2(js):
     """Compress variables and functions names.
 
-    >>> slim('function foo( long_variable_name, bar ) { console.log(bar); };')
-    'function foo(_0,_1) { console.log(_1); };'
+    >>> js_minify2('function foo(long_variable_name,bar){console.log(bar);};')
+    'function foo(_0,_1){console.log(_1);};'
     """
     log.debug("Obfuscating Javascript variables names inside functions.")
     # if eval() or with{} is used on JS is not too Safe to Obfuscate stuff.
@@ -801,13 +963,13 @@ def process_single_css_file(css_file_path):
     try:  # Python3
         with open(css_file_path, encoding="utf-8-sig") as css_file:
             original_css = css_file.read()
-            minified_css = cssmin(original_css, wrap=80,
-                                  comments=args.comments)
+            minified_css = css_minify(original_css, wrap=args.wrap,
+                                      comments=args.comments)
     except:  # Python2
         with open(css_file_path) as css_file:
             original_css = css_file.read()
-            minified_css = cssmin(original_css, wrap=80,
-                                  comments=args.comments)
+            minified_css = css_minify(original_css, wrap=args.wrap,
+                                      comments=args.comments)
     if args.timestamp:
         taim = "/* {} */ ".format(datetime.now().isoformat()[:-7].lower())
         minified_css = taim + minified_css
@@ -840,10 +1002,12 @@ def process_single_html_file(html_file_path):
     log.info("Processing HTML file: {}".format(html_file_path))
     try:  # Python3
         with open(html_file_path, encoding="utf-8-sig") as html_file:
-            minified_html = htmlmin(html_file.read(), comments=args.comments)
+            minified_html = html_minify(html_file.read(),
+                                        comments=args.comments)
     except:  # Python2
         with open(html_file_path) as html_file:
-            minified_html = htmlmin(html_file.read(), comments=args.comments)
+            minified_html = html_minify(html_file.read(),
+                                        comments=args.comments)
     html_file_path = prefixer_extensioner(html_file_path, ".htm", ".html")
     try:  # Python3
         with open(html_file_path, "w", encoding="utf-8") as output_file:
@@ -859,11 +1023,13 @@ def process_single_js_file(js_file_path):
     try:  # Python3
         with open(js_file_path, encoding="utf-8-sig") as js_file:
             original_js = js_file.read()
-            minified_js = simple_replacer_js(jsmin(slim(original_js)))
+            minified_js = simple_replacer_js(js_minify(
+                js_minify2(original_js)))
     except:  # Python2
         with open(js_file_path) as js_file:
             original_js = js_file.read()
-            minified_js = simple_replacer_js(jsmin(slim(original_js)))
+            minified_js = simple_replacer_js(js_minify(
+                js_minify2(original_js)))
     if args.timestamp:
         taim = "/* {} */ ".format(datetime.now().isoformat()[:-7].lower())
         minified_js = taim + minified_js
@@ -954,7 +1120,8 @@ def main():
     Takes a file or folder full path string and process all CSS/HTML/JS found.
     If argument is not file/folder will fail. Check Updates works on Python3.
     StdIn to StdOut is deprecated since may fail with unicode characters.
-    SHA1 HEX-Digest 11 Chars Hash on Filenames is used for Server Cache.""")
+    SHA1 HEX-Digest 11 Chars Hash on Filenames is used for Server Cache.
+    CSS Properties are AlphaSorted,to help spot cloned ones,Selectors not.""")
     parser.add_argument('--version', action='version', version=__version__)
     parser.add_argument('fullpath', metavar='fullpath', type=str,
                         help='Full path to local file or folder.')
