@@ -37,7 +37,7 @@ except ImportError:
     resource = None  # windows dont have resource
 
 
-__version__ = "1.0.9"
+__version__ = "1.0.10"
 __license__ = "GPLv3+ LGPLv3+"
 __author__ = "Juan Carlos"
 __email__ = "juancarlospaco@gmail.com"
@@ -229,7 +229,8 @@ def condense_floating_points(css):
 def condense_hex_colors(css):
     """Shorten colors from #AABBCC to #ABC where possible."""
     log.debug("Condensing all hexadecimal color values.")
-    regex = re.compile(r"""([^\"'=\s])(\s*)#([0-9a-f])([0-9a-f])([0-9a-f])"""
+    regex = re.compile(
+        r"""([^\"'=\s])(\s*)#([0-9a-f])([0-9a-f])([0-9a-f])"""
         + r"([0-9a-f])([0-9a-f])([0-9a-f])", re.I | re.S)
     match = regex.search(css)
     while match:
@@ -281,7 +282,7 @@ def condense_std_named_colors(css):
     log.debug("Condensing standard named color values.")
     for color_name, color_hexa in iter(tuple({
         ':aqua;': ':#0ff;', ':blue;': ':#00f;',
-        ':fuchsia;': ':#f0f;', ':yellow;': ':#ff0;'}.items())):
+            ':fuchsia;': ':#f0f;', ':yellow;': ':#ff0;'}.items())):
         css = css.replace(color_name, color_hexa)
     return css
 
@@ -800,11 +801,13 @@ def process_single_css_file(css_file_path):
     try:  # Python3
         with open(css_file_path, encoding="utf-8-sig") as css_file:
             original_css = css_file.read()
-            minified_css = cssmin(original_css, wrap=80, comments=args.comments)
+            minified_css = cssmin(original_css, wrap=80,
+                                  comments=args.comments)
     except:  # Python2
         with open(css_file_path) as css_file:
             original_css = css_file.read()
-            minified_css = cssmin(original_css, wrap=80, comments=args.comments)
+            minified_css = cssmin(original_css, wrap=80,
+                                  comments=args.comments)
     if args.timestamp:
         taim = "/* {} */ ".format(datetime.now().isoformat()[:-7].lower())
         minified_css = taim + minified_css
@@ -944,7 +947,7 @@ def main():
         buff = create_string_buffer(len("css-html-js-minify") + 1)
         buff.value = bytes("css-html-js-minify".encode("utf-8"))
         libc.prctl(15, byref(buff), 0, 0, 0)
-    except Exception as reason:
+    except Exception:
         pass  # this may fail on windows and its normal, so be silent.
     # Parse command line arguments.
     parser = ArgumentParser(description=__doc__, epilog="""CSS-HTML-JS-Minify:
