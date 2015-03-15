@@ -23,11 +23,13 @@ from doctest import testmod
 from hashlib import sha1
 from multiprocessing import cpu_count, Pool
 from tempfile import gettempdir
+from time import sleep
 
 try:
     from urllib import request
+    from subprocess import getoutput
 except ImportError:
-    request = None
+    request = getoutput = None
 try:
     from StringIO import StringIO  # pure-Python StringIO supports unicode.
 except ImportError:
@@ -38,7 +40,7 @@ except ImportError:
     resource = None  # windows dont have resource
 
 
-__version__ = "1.0.10"
+__version__ = "1.0.11"
 __license__ = "GPLv3+ LGPLv3+"
 __author__ = "Juan Carlos"
 __email__ = "juancarlospaco@gmail.com"
@@ -663,8 +665,8 @@ def js_minify(js):
 
 def force_single_line_js(js):
     """Force Javascript to a single line, even if need to add semicolon."""
-    log.debug("Forcing JS from {} to 1 Line.".format(len(js.split("\n"))))
-    return ";".join(js.split("\n")) if len(js.split("\n")) > 1 else js.strip()
+    log.debug("Forcing JS from {} to 1 Line.".format(len(js.splitlines())))
+    return ";".join(js.splitlines()) if len(js.splitlines()) > 1 else js
 
 
 # regular expressions to find and work with Javascript functions and variables
@@ -927,12 +929,28 @@ def walkdir_to_filelist(where, target, omit):
 def process_multiple_files(file_path):
     """Process multiple CSS, JS, HTML files with multiprocessing."""
     log.debug("Process {} is Compressing {}.".format(os.getpid(), file_path))
-    if file_path.endswith(".css"):
-        process_single_css_file(file_path)
-    elif file_path.endswith(".js"):
-        process_single_js_file(file_path)
+    if args.watch:
+        previous = int(os.stat(file_path).st_mtime)
+        log.info("Process {} is Watching {}.".format(os.getpid(), file_path))
+        while True:
+            actual = int(os.stat(file_path).st_mtime)
+            if previous == actual:
+                sleep(60)
+            else:
+                previous = actual
+                if file_path.endswith(".css"):
+                    process_single_css_file(file_path)
+                elif file_path.endswith(".js"):
+                    process_single_js_file(file_path)
+                else:
+                    process_single_html_file(file_path)
     else:
-        process_single_html_file(file_path)
+        if file_path.endswith(".css"):
+            process_single_css_file(file_path)
+        elif file_path.endswith(".js"):
+            process_single_js_file(file_path)
+        else:
+            process_single_html_file(file_path)
 
 
 def prefixer_extensioner(file_path, old, new, file_content=None):
@@ -963,13 +981,11 @@ def process_single_css_file(css_file_path):
     try:  # Python3
         with open(css_file_path, encoding="utf-8-sig") as css_file:
             original_css = css_file.read()
-            minified_css = css_minify(original_css, wrap=args.wrap,
-                                      comments=args.comments)
     except:  # Python2
         with open(css_file_path) as css_file:
             original_css = css_file.read()
-            minified_css = css_minify(original_css, wrap=args.wrap,
-                                      comments=args.comments)
+    minified_css = css_minify(original_css,
+                              wrap=args.wrap, comments=args.comments)
     if args.timestamp:
         taim = "/* {} */ ".format(datetime.now().isoformat()[:-7].lower())
         minified_css = taim + minified_css
@@ -1023,13 +1039,13 @@ def process_single_js_file(js_file_path):
     try:  # Python3
         with open(js_file_path, encoding="utf-8-sig") as js_file:
             original_js = js_file.read()
-            minified_js = simple_replacer_js(js_minify(
-                js_minify2(original_js)))
     except:  # Python2
         with open(js_file_path) as js_file:
             original_js = js_file.read()
-            minified_js = simple_replacer_js(js_minify(
-                js_minify2(original_js)))
+    if args.obfuscate:  # with obfuscation
+        minified_js = simple_replacer_js(js_minify(js_minify2(original_js)))
+    else:  # without obfuscation
+        minified_js = js_minify(original_js)
     if args.timestamp:
         taim = "/* {} */ ".format(datetime.now().isoformat()[:-7].lower())
         minified_js = taim + minified_js
@@ -1069,8 +1085,8 @@ def check_for_updates():
         log.info("No new updates!,You have the lastest version of this app.")
 
 
-def main():
-    """Main Loop."""
+def make_arguments_parser():
+    """Build and return a command line agument parser."""
     if not sys.platform.startswith("win") and sys.stderr.isatty():
         def add_color_emit_ansi(fn):
             """Add methods we need to the class."""
@@ -1121,7 +1137,8 @@ def main():
     If argument is not file/folder will fail. Check Updates works on Python3.
     StdIn to StdOut is deprecated since may fail with unicode characters.
     SHA1 HEX-Digest 11 Chars Hash on Filenames is used for Server Cache.
-    CSS Properties are AlphaSorted,to help spot cloned ones,Selectors not.""")
+    CSS Properties are AlphaSorted,to help spot cloned ones,Selectors not.
+    Watch works for whole Folders, with minimum of ~60 Secs between runs.""")
     parser.add_argument('--version', action='version', version=__version__)
     parser.add_argument('fullpath', metavar='fullpath', type=str,
                         help='Full path to local file or folder.')
@@ -1133,6 +1150,8 @@ def main():
                         help="Add a Time Stamp on all CSS/JS output files.")
     parser.add_argument('--quiet', action='store_true',
                         help="Quiet, Silent, force disable all Logging.")
+    parser.add_argument('--obfuscate', action='store_true',
+                        help="Obfuscate Javascript. JS Only. (Recommended).")
     parser.add_argument('--checkupdates', action='store_true',
                         help="Check for Updates from Internet while running.")
     parser.add_argument('--tests', action='store_true',
@@ -1142,11 +1161,22 @@ def main():
     parser.add_argument('--gzip', action='store_true',
                         help="GZIP Minified files as '*.gz', CSS/JS Only.")
     parser.add_argument('--comments', action='store_true',
-                        help="Keep Comments, CSS/HTML Only.")
+                        help="Keep Comments, CSS/HTML Only (Not Recommended)")
     parser.add_argument('--overwrite', action='store_true',
                         help="Force overwrite all in-place (Not Recommended)")
+    parser.add_argument('--after', type=str,
+                        help="Command to execute after run (Experimental).")
+    parser.add_argument('--before', type=str,
+                        help="Command to execute before run (Experimental).")
+    parser.add_argument('--watch', action='store_true',
+                        help="Re-Compress if file changes (Experimental).")
     global args
     args = parser.parse_args()
+
+
+def main():
+    """Main Loop."""
+    make_arguments_parser()
     if args.checkupdates:
         check_for_updates()
     if args.tests:
@@ -1155,6 +1185,10 @@ def main():
     if args.quiet:
         log.disable(log.CRITICAL)
     log.info(__doc__ + __version__)
+    if args.before and len(args.before) and not getoutput:
+        log.critical("Feature only available on Python 3.x, command ignored.")
+    if args.before and len(args.before) and getoutput:
+        log.info(getoutput(str(args.before)))
     # Work based on if argument is file or folder, folder is slower.
     if os.path.isfile(args.fullpath) and args.fullpath.endswith(".css"):
         log.info("Target is a CSS File.")
@@ -1183,6 +1217,10 @@ def main():
     else:
         log.critical("File or folder not found,or cant be read,or I/O Error.")
         sys.exit(1)
+    if args.after and len(args.after) and not getoutput:
+        log.critical("Feature only available on Python 3.x, command ignored.")
+    if args.after and len(args.after) and getoutput:
+        log.info(getoutput(str(args.after)))
     log.info('-' * 80)
     log.info('Files Processed: {}.'.format(list_of_files))
     log.info('Number of Files Processed: {}'.format(
