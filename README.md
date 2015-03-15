@@ -11,11 +11,11 @@
 css-html-js-minify.py --help
 
 usage: css-html-js-minify.py [-h] [--version] [--wrap] [--prefix PREFIX]
-[--timestamp] [--quiet] [--checkupdates]
-[--tests] [--hash] [--gzip] [--comments]
-[--overwrite]
+[--timestamp] [--quiet] [--obfuscate]
+[--checkupdates] [--tests] [--hash] [--gzip]
+[--comments] [--overwrite] [--after AFTER]
+[--before BEFORE] [--watch]
 fullpath
-
 
 CSS-HTML-JS-Minify. StandAlone Async single-file cross-platform no-
 dependencies Unicode-ready Python3-ready Minifier for the Web.
@@ -23,27 +23,30 @@ dependencies Unicode-ready Python3-ready Minifier for the Web.
 positional arguments:
     fullpath         Full path to local file or folder.
 
-optional arguments:
-    -h, --help       show this help message and exit
-    --version        show programs version number and exit
-    --wrap           Wrap Output to ~80 chars per line, CSS Only.
-    --prefix PREFIX  Prefix string to prepend on output filenames.
-    --timestamp      Add a Time Stamp on all CSS/JS output files.
-    --quiet          Quiet, Silent, force disable all Logging.
-    --checkupdates   Check for Updates from Internet while running.
-    --tests          Run all built-in Unit Tests, report and exit.
-    --hash           Add SHA1 HEX-Digest 11chars Hash to Filenames.
-    --gzip           GZIP Minified files as '*.gz'. CSS/JS Only.
-    --comments       Keep Comments, CSS/HTML Only.
-    --overwrite      Force overwrite all in-place (Not Recommended)
+    optional arguments:
+        -h, --help       show this help message and exit
+        --version        show program's version number and exit
+        --wrap           Wrap Output to ~80 chars per line, CSS Only.
+        --prefix PREFIX  Prefix string to prepend on output filenames.
+        --timestamp      Add a Time Stamp on all CSS/JS output files.
+        --quiet          Quiet, Silent, force disable all Logging.
+        --obfuscate      Obfuscate Javascript. JS Only. (Recommended).
+        --checkupdates   Check for Updates from Internet while running.
+        --tests          Run all built-in Unit Tests, report and exit.
+        --hash           Add SHA1 HEX-Digest 11chars Hash to Filenames.
+        --gzip           GZIP Minified files as '*.gz', CSS/JS Only.
+        --comments       Keep Comments, CSS/HTML Only (Not Recommended)
+        --overwrite      Force overwrite all in-place (Not Recommended)
+        --after AFTER    Command to execute after run (Experimental).
+        --before BEFORE  Command to execute before run (Experimental).
+        --watch          Re-Compress if file changes (Experimental).
 
-
-CSS-HTML-JS-Minify:
-Takes a file or folder full path string and process all CSS/HTML/JS found.
-If argument is not file/folder will fail.
-Check Updates works on Python3.
-StdIn to StdOut is deprecated since may fail with unicode characters.
-SHA1 HEX-Digest 11 Chars Hash on Filenames is used for Server Cache.
+        CSS-HTML-JS-Minify: Takes a file or folder full path string and process all
+        CSS/HTML/JS found. If argument is not file/folder will fail. Check Updates
+        works on Python3. StdIn to StdOut is deprecated since may fail with unicode
+        characters. SHA1 HEX-Digest 11 Chars Hash on Filenames is used for Server
+        Cache. CSS Properties are AlphaSorted,to help spot cloned ones,Selectors not.
+        Watch works for whole Folders, with minimum of ~60 Secs between runs.
 
 ```
 
@@ -55,6 +58,8 @@ SHA1 HEX-Digest 11 Chars Hash on Filenames is used for Server Cache.
 - Can check for updates for itself.
 - Full Unicode/UTF-8 support.
 - Smooth CPU usage.
+- Can Obfuscate, GZIP and Hash files, also Watch for changes on files.
+- Can execute arbitrary commands after and before running.
 - `*.css` files are saved as `*.min.css`, `*.js` are saved as `*.min.js`, `*.htm` are saved as `*.html`
 
 
