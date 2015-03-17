@@ -106,7 +106,7 @@ css-html-js-minify
 
 - **Why another Compressor ?**, theres lots of Compressor for Web files outthere!; *Or maybe not ?*.
 - Lots work inside DJango/Flask only, or Frameworks of PHP/Java/Ruby, or can Not process whole folders.
-
+- This project is the big brother of [another project that does the inverse, a Beautifier for the Web.](https://github.com/juancarlospaco/css-html-prettify#css-html-prettify)
 
 **Input CSS:**
 ```css
