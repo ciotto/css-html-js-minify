@@ -160,7 +160,7 @@ css-html-js-minify
 
 # Migration:
 
-- Too keep things simple [KISS](http://en.wikipedia.org/wiki/KISS_principle), the human readable indented commented hackable HTML is keep as `*.htm` and the Compressed Production-ready as `*.html`. This is inspired from JavaScript/CSS `*.min.js` and `*.min.css`.
+- Too keep things simple [KISS](http://en.wikipedia.org/wiki/KISS_principle), the human readable indented commented hackable HTML is keep as `*.htm` and the Compressed Production-ready as `*.html`. This is inspired from JavaScript/CSS `*.min.js` and `*.min.css`. [We didnt "invent" this file extension.](http://en.wikipedia.org/wiki/HTM)
 
 To Migrate from tipical file extension HTML to HTM, which is the exactly same, you can run this:
 
