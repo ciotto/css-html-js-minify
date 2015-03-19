@@ -28,16 +28,13 @@ from time import sleep
 try:
     from urllib import request
     from subprocess import getoutput
+    import resource  # windows dont have resource
 except ImportError:
-    request = getoutput = None
+    request = getoutput = resource = None
 try:
     from StringIO import StringIO  # pure-Python StringIO supports unicode.
 except ImportError:
     from io import StringIO  # lint:ok
-try:
-    import resource
-except ImportError:
-    resource = None  # windows dont have resource
 
 
 __version__ = "1.0.11"
@@ -49,9 +46,7 @@ __source__ = ("https://raw.githubusercontent.com/juancarlospaco/"
               "css-html-js-minify/master/css-html-js-minify.py")
 
 
-start_time = datetime.now()
-# 'Color Name String': (R, G, B)
-EXTENDED_NAMED_COLORS = {
+EXTENDED_NAMED_COLORS, start_time = {  # 'Color Name String': (R, G, B)
     'azure': (240, 255, 255), 'beige': (245, 245, 220),
     'bisque': (255, 228, 196), 'blanchedalmond': (255, 235, 205),
     'brown': (165, 42, 42), 'burlywood': (222, 184, 135),
@@ -105,89 +100,53 @@ EXTENDED_NAMED_COLORS = {
     'springgreen': (0, 255, 127), 'teal': (0, 128, 128),
     'thistle': (216, 191, 216), 'tomato': (255, 99, 71),
     'turquoise': (64, 224, 208), 'violet': (238, 130, 238),
-    'wheat': (245, 222, 179)
-}
-CSS_PROPS_TEXT = '''
-alignment-adjust alignment-baseline animation animation-delay
-animation-direction animation-duration animation-iteration-count
-animation-name animation-play-state animation-timing-function appearance
-azimuth
-
-backface-visibility background background-attachment background-clip
-background-color background-image background-origin background-position
-background-repeat background-size baseline-shift bikeshedding bookmark-label
-bookmark-level bookmark-state bookmark-target border border-bottom
-border-bottom-color border-bottom-left-radius border-bottom-right-radius
-border-bottom-style border-bottom-width border-collapse border-color
-border-image border-image-outset border-image-repeat border-image-slice
-border-image-source border-image-width border-left border-left-color
-border-left-style border-left-width border-radius border-right
-border-right-color border-right-style border-right-width border-spacing
-border-style border-top border-top-color border-top-left-radius
-border-top-right-radius border-top-style border-top-width border-width bottom
-box-decoration-break box-shadow box-sizing
-
-caption-side clear clip color column-count column-fill column-gap column-rule
-column-rule-color column-rule-style column-rule-width column-span column-width
-columns content counter-increment counter-reset cue cue-after cue-before
-cursor
-
-direction display drop-initial-after-adjust drop-initial-after-align
-drop-initial-before-adjust drop-initial-before-align drop-initial-size
-drop-initial-value
-
-elevation empty-cells
-
-fit fit-position float font font-family font-size font-size-adjust
-font-stretch font-style font-variant font-weight
-
-grid-columns grid-rows
-
-hanging-punctuation height hyphenate-character hyphenate-resource hyphens
-
-icon image-orientation image-resolution inline-box-align
-
-left letter-spacing line-height line-stacking line-stacking-ruby
-line-stacking-shift line-stacking-strategy linear-gradient list-style
-list-style-image list-style-position list-style-type
-
-margin margin-bottom margin-left margin-right margin-top marquee-direction
-marquee-loop marquee-speed marquee-style max-height max-width min-height
-min-width
-
-nav-index
-
-opacity orphans outline outline-color outline-offset outline-style
-outline-width overflow overflow-style overflow-x overflow-y
-
-padding padding-bottom padding-left padding-right padding-top page
+    'wheat': (245, 222, 179)}, datetime.now()
+CSS_PROPS_TEXT = '''alignment-adjust alignment-baseline animation
+animation-delay animation-direction animation-duration
+animation-iteration-count animation-name animation-play-state
+animation-timing-function appearance azimuth backface-visibility background
+background-attachment background-clip background-color background-image
+background-origin background-position background-repeat background-size
+baseline-shift bikeshedding bookmark-label bookmark-level bookmark-state
+bookmark-target border border-bottom border-bottom-color
+border-bottom-left-radius border-bottom-right-radius border-bottom-style
+border-bottom-width border-collapse border-color border-image
+border-image-outset border-image-repeat border-image-slice border-image-source
+border-image-width border-left border-left-color border-left-style
+border-left-width border-radius border-right border-right-color
+border-right-style border-right-width border-spacing border-style border-top
+border-top-color border-top-left-radius border-top-right-radius
+border-top-style border-top-width border-width bottom box-decoration-break
+box-shadow box-sizing caption-side clear clip color column-count column-fill
+column-gap column-rule column-rule-color column-rule-style column-rule-width
+column-span column-width columns content counter-increment counter-reset cue
+cue-after cue-before cursor direction display drop-initial-after-adjust
+drop-initial-after-align drop-initial-before-adjust drop-initial-before-align
+drop-initial-size drop-initial-value elevation empty-cells fit fit-position
+float font font-family font-size font-size-adjust font-stretch font-style
+font-variant font-weight grid-columns grid-rows hanging-punctuation height
+hyphenate-character hyphenate-resource hyphens icon image-orientation
+image-resolution inline-box-align left letter-spacing line-height
+line-stacking line-stacking-ruby line-stacking-shift line-stacking-strategy
+linear-gradient list-style list-style-image list-style-position
+list-style-type margin margin-bottom margin-left margin-right margin-top
+marquee-direction marquee-loop marquee-speed marquee-style max-height
+max-width min-height min-width nav-index opacity orphans outline outline-color
+outline-offset outline-style outline-width overflow overflow-style overflow-x
+overflow-y padding padding-bottom padding-left padding-right padding-top page
 page-break-after page-break-before page-break-inside pause pause-after
 pause-before perspective perspective-origin pitch pitch-range play-during
-position presentation-level
-
-quotes
-
-resize rest rest-after rest-before richness right rotation rotation-point
-ruby-align ruby-overhang ruby-position ruby-span
-
-size speak speak-header speak-numeral speak-punctuation speech-rate src
-stress string-set
-
-table-layout target target-name target-new target-position text-align
-text-align-last text-decoration text-emphasis text-indent text-justify
-text-outline text-shadow text-transform text-wrap top transform
+position presentation-level quotes resize rest rest-after rest-before richness
+right rotation rotation-point ruby-align ruby-overhang ruby-position ruby-span
+size speak speak-header speak-numeral speak-punctuation speech-rate src stress
+string-set table-layout target target-name target-new target-position
+text-align text-align-last text-decoration text-emphasis text-indent
+text-justify text-outline text-shadow text-transform text-wrap top transform
 transform-origin transition transition-delay transition-duration
-transition-property transition-timing-function
-
-unicode-bidi unicode-range
-
+transition-property transition-timing-function unicode-bidi unicode-range
 vertical-align visibility voice-balance voice-duration voice-family
 voice-pitch voice-range voice-rate voice-stress voice-volume volume
-
-white-space widows width word-break word-spacing word-wrap
-
-z-index
-'''
+white-space widows width word-break word-spacing word-wrap z-index'''
 
 
 ###############################################################################
@@ -278,8 +237,7 @@ def remove_comments(css):
     log.debug("Removing all Comments.")
     iemac, preserve = False, False
     comment_start = css.find("/*")
-    while comment_start >= 0:
-        # Preserve comments that look like `/*!...*/`.
+    while comment_start >= 0:  # Preserve comments that look like `/*!...*/`.
         # Slicing is used to make sure we dont get an IndexError.
         preserve = css[comment_start + 2:comment_start + 3] == "!"
         comment_end = css.find("*/", comment_start + 2)
@@ -306,7 +264,7 @@ def remove_comments(css):
 
 def remove_unnecessary_whitespace(css):
     """Remove unnecessary whitespace characters."""
-    log.debug("Removing all unnecessary whitespace.")
+    log.debug("Removing all unnecessary white spaces.")
 
     def pseudoclasscolon(css):
         """Prevent 'p :link' from becoming 'p:link'.
@@ -368,7 +326,7 @@ def normalize_rgb_colors_to_hex(css):
 def condense_zero_units(css):
     """Replace `0(px, em, %, etc)` with `0`."""
     log.debug("Condensing all zeroes on values.")
-    return re.sub(r"([\s:])(0)(px|em|%|in|cm|mm|pc|pt|ex)", r"\1\2", css)
+    return re.sub(r"([\s:])(0)(px|em|%|in|cm|mm|pc|pt|ex|rem)", r"\1\2", css)
 
 
 def condense_multidimensional_zeros(css):
@@ -665,7 +623,7 @@ def js_minify(js):
 
 def force_single_line_js(js):
     """Force Javascript to a single line, even if need to add semicolon."""
-    log.debug("Forcing JS from {} to 1 Line.".format(len(js.splitlines())))
+    log.debug("Forcing JS from ~{} to 1 Line.".format(len(js.splitlines())))
     return ";".join(js.splitlines()) if len(js.splitlines()) > 1 else js
 
 
@@ -919,7 +877,7 @@ class JavascriptMinify(object):
 def walkdir_to_filelist(where, target, omit):
     """Perform full walk of where, gather full path of all files."""
     log.debug("""Recursively Scanning {}, searching for {}, and ignoring {}.
-    """.format(where, target, omit))
+    """.format(where, target.upper(), omit.upper()))
     return tuple([os.path.join(root, f) for root, d, files in os.walk(where)
                   for f in files if not f.startswith('.')  # ignore hidden
                   and not f.endswith(omit)  # not process processed file
@@ -938,6 +896,7 @@ def process_multiple_files(file_path):
                 sleep(60)
             else:
                 previous = actual
+                log.debug("Modification detected on {}.".format(file_path))
                 if file_path.endswith(".css"):
                     process_single_css_file(file_path)
                 elif file_path.endswith(".js"):
@@ -954,14 +913,14 @@ def process_multiple_files(file_path):
 
 
 def prefixer_extensioner(file_path, old, new, file_content=None):
-    """Take a file path and safely prepend a prefix and change extension.
+    """Take a file path and safely preppend a prefix and change extension.
 
     This is needed because filepath.replace('.foo', '.bar') sometimes may
     replace '/folder.foo/file.foo' into '/folder.bar/file.bar' wrong!.
     >>> prefixer_extensioner('/tmp/test.js', '.js', '.min.js')
     '/tmp/test.min.js'
     """
-    log.debug("Prepending '{}' Prefix to {}.".format(new, file_path))
+    log.debug("Prepending '{}' Prefix to {}.".format(new.upper(), file_path))
     global args
     extension = os.path.splitext(file_path)[1].lower().replace(old, new)
     filenames = os.path.splitext(os.path.basename(file_path))[0]
@@ -976,7 +935,7 @@ def prefixer_extensioner(file_path, old, new, file_content=None):
 
 def process_single_css_file(css_file_path):
     """Process a single CSS file."""
-    log.info("Processing CSS file: {}".format(css_file_path))
+    log.info("Processing CSS file: {}.".format(css_file_path))
     global args
     try:  # Python3
         with open(css_file_path, encoding="utf-8-sig") as css_file:
@@ -992,22 +951,21 @@ def process_single_css_file(css_file_path):
     min_css_file_path = prefixer_extensioner(
         css_file_path, ".css", ".css" if args.overwrite else ".min.css",
         original_css)
-    if args.gzip:
+    if only_on_py3(args.gzip):
         gz_file_path = prefixer_extensioner(
-            css_file_path,
-            ".css", ".css.gz" if args.overwrite else ".min.css.gz",
-            original_css)
+            css_file_path, ".css",
+            ".css.gz" if args.overwrite else ".min.css.gz", original_css)
     try:
         with open(min_css_file_path, "w", encoding="utf-8") as output_file:
             output_file.write(minified_css)
-        if args.gzip:
+        if only_on_py3(args.gzip):
             with gzip.open(gz_file_path, "wt", encoding="utf-8") as output_gz:
                 output_gz.write(minified_css)
             log.debug("Saving GZIPed Minified file {}.".format(gz_file_path))
     except:
         with open(min_css_file_path, "w") as output_file:
             output_file.write(minified_css)
-        if args.gzip:
+        if only_on_py3(args.gzip):
             with gzip.open(gz_file_path, "w") as output_gz:
                 output_gz.write(minified_css)
             log.debug("Saving GZIPed Minified file {}.".format(gz_file_path))
@@ -1015,15 +973,15 @@ def process_single_css_file(css_file_path):
 
 def process_single_html_file(html_file_path):
     """Process a single HTML file."""
-    log.info("Processing HTML file: {}".format(html_file_path))
+    log.info("Processing HTML file: {}.".format(html_file_path))
     try:  # Python3
         with open(html_file_path, encoding="utf-8-sig") as html_file:
             minified_html = html_minify(html_file.read(),
-                                        comments=args.comments)
+                                        comments=only_on_py3(args.comments))
     except:  # Python2
         with open(html_file_path) as html_file:
             minified_html = html_minify(html_file.read(),
-                                        comments=args.comments)
+                                        comments=only_on_py3(args.comments))
     html_file_path = prefixer_extensioner(html_file_path, ".htm", ".html")
     try:  # Python3
         with open(html_file_path, "w", encoding="utf-8") as output_file:
@@ -1035,7 +993,7 @@ def process_single_html_file(html_file_path):
 
 def process_single_js_file(js_file_path):
     """Process a single JS file."""
-    log.info("Processing JS file: {}".format(js_file_path))
+    log.info("Processing JS file: {}.".format(js_file_path))
     try:  # Python3
         with open(js_file_path, encoding="utf-8-sig") as js_file:
             original_js = js_file.read()
@@ -1052,21 +1010,21 @@ def process_single_js_file(js_file_path):
     min_js_file_path = prefixer_extensioner(
         js_file_path, ".js", ".js" if args.overwrite else ".min.js",
         original_js)
-    if args.gzip:
+    if only_on_py3(args.gzip):
         gz_file_path = prefixer_extensioner(
             js_file_path, ".js", ".js.gz" if args.overwrite else ".min.js.gz",
             original_js)
     try:  # Python3
         with open(min_js_file_path, "w", encoding="utf-8") as output_file:
             output_file.write(minified_js)
-        if args.gzip:
+        if only_on_py3(args.gzip):
             with gzip.open(gz_file_path, "wt", encoding="utf-8") as output_gz:
                 output_gz.write(minified_js)
             log.debug("Saving GZIPed Minified file {}.".format(gz_file_path))
     except:  # Python2
         with open(min_js_file_path, "w") as output_file:
             output_file.write(minified_js)
-        if args.gzip:
+        if only_on_py3(args.gzip):
             with gzip.open(gz_file_path, "w") as output_gz:
                 output_gz.write(minified_js)
             log.debug("Saving GZIPed Minified file {}.".format(gz_file_path))
@@ -1074,15 +1032,26 @@ def process_single_js_file(js_file_path):
 
 def check_for_updates():
     """Method to check for updates from Git repo versus this version."""
-    if not request:
-        log.critical("Feature only available on Python 3.x, command ignored.")
-        return
-    this_version = str(open(__file__).read())
+    this_version = str(open(__file__, "r", encoding="utf-8-sig").read())
     last_version = str(request.urlopen(__source__).read().decode("utf8"))
     if this_version != last_version:
         log.warning("Theres new Version available!,Update from " + __source__)
     else:
-        log.info("No new updates!,You have the lastest version of this app.")
+        log.info("No new updates!, You have the latest version of this app.")
+
+
+def only_on_py3(boolean_argument=True):
+    """Deprecate features if not using Python >= 3, to motivate migration."""
+    if isinstance(boolean_argument, (tuple, list)):  # argument is iterable.
+        boolean_argument = all(boolean_argument)
+    else:  # argument is boolean, or evaluate as boolean, even if is not.
+        boolean_argument = bool(boolean_argument)
+    if sys.version_info.major >= 3:
+        return boolean_argument  # good to go
+    else:  # Migrate to python 3, is free and easy, get a virtualenv at least.
+        log.critical("Feature only available on Python 3, feature ignored !.")
+        log.debug("Please Migrate to Python 3 for better User Experience...")
+        return False
 
 
 def make_arguments_parser():
@@ -1131,37 +1100,36 @@ def make_arguments_parser():
         libc.prctl(15, byref(buff), 0, 0, 0)
     except Exception:
         pass  # this may fail on windows and its normal, so be silent.
-    # Parse command line arguments.
     parser = ArgumentParser(description=__doc__, epilog="""CSS-HTML-JS-Minify:
     Takes a file or folder full path string and process all CSS/HTML/JS found.
     If argument is not file/folder will fail. Check Updates works on Python3.
-    StdIn to StdOut is deprecated since may fail with unicode characters.
+    Std-In to Std-Out is deprecated since it may fail with unicode characters.
     SHA1 HEX-Digest 11 Chars Hash on Filenames is used for Server Cache.
-    CSS Properties are AlphaSorted,to help spot cloned ones,Selectors not.
-    Watch works for whole Folders, with minimum of ~60 Secs between runs.""")
+    CSS Properties are Alpha-Sorted, to help spot cloned ones, Selectors not.
+    Watch works for whole folders, with minimum of ~60 Secs between runs.""")
     parser.add_argument('--version', action='version', version=__version__)
     parser.add_argument('fullpath', metavar='fullpath', type=str,
                         help='Full path to local file or folder.')
     parser.add_argument('--wrap', action='store_true',
-                        help="Wrap Output to ~80 chars per line, CSS Only.")
+                        help="Wrap output to ~80 chars per line, CSS only.")
     parser.add_argument('--prefix', type=str,
                         help="Prefix string to prepend on output filenames.")
     parser.add_argument('--timestamp', action='store_true',
                         help="Add a Time Stamp on all CSS/JS output files.")
     parser.add_argument('--quiet', action='store_true',
-                        help="Quiet, Silent, force disable all Logging.")
+                        help="Quiet, Silent, force disable all logging.")
     parser.add_argument('--obfuscate', action='store_true',
-                        help="Obfuscate Javascript. JS Only. (Recommended).")
+                        help="Obfuscate Javascript. JS only. (Recommended).")
     parser.add_argument('--checkupdates', action='store_true',
-                        help="Check for Updates from Internet while running.")
+                        help="Check for updates from internet while running.")
     parser.add_argument('--tests', action='store_true',
                         help="Run all built-in Unit Tests, report and exit.")
     parser.add_argument('--hash', action='store_true',
                         help="Add SHA1 HEX-Digest 11chars Hash to Filenames.")
     parser.add_argument('--gzip', action='store_true',
-                        help="GZIP Minified files as '*.gz', CSS/JS Only.")
+                        help="GZIP Minified files as '*.gz', CSS/JS only.")
     parser.add_argument('--comments', action='store_true',
-                        help="Keep Comments, CSS/HTML Only (Not Recommended)")
+                        help="Keep comments, CSS/HTML only (Not Recommended)")
     parser.add_argument('--overwrite', action='store_true',
                         help="Force overwrite all in-place (Not Recommended)")
     parser.add_argument('--after', type=str,
@@ -1170,6 +1138,7 @@ def make_arguments_parser():
                         help="Command to execute before run (Experimental).")
     parser.add_argument('--watch', action='store_true',
                         help="Re-Compress if file changes (Experimental).")
+    parser.add_argument('--_42', action='store_true')
     global args
     args = parser.parse_args()
 
@@ -1177,17 +1146,21 @@ def make_arguments_parser():
 def main():
     """Main Loop."""
     make_arguments_parser()
-    if args.checkupdates:
+    if args._42:  # Resynchronize flux capacitor.
+        print((lambda r: '\n'.join(''.join('#' if (y >= r and((x - r) ** 2 + (
+            y - r) ** 2 <= r ** 2 or (x - 3 * r) ** 2 + (y - r) ** 2 < r ** 2)
+        ) or (y < r and x + r < y and x - r > 4 * r - y) else '.' for x in
+            range(4 * r)) for y in range(1, 3 * r, 2)))(9) +
+            "\n! ti htiw laeD ........####################........\n"[::-1])
+    if only_on_py3((args.checkupdates, request)):
         check_for_updates()
     if args.tests:
         testmod(verbose=True, report=True, exclude_empty=True)
         sys.exit(0)
-    if args.quiet:
+    if only_on_py3(args.quiet):
         log.disable(log.CRITICAL)
     log.info(__doc__ + __version__)
-    if args.before and len(args.before) and not getoutput:
-        log.critical("Feature only available on Python 3.x, command ignored.")
-    if args.before and len(args.before) and getoutput:
+    if only_on_py3((args.before, getoutput)):
         log.info(getoutput(str(args.before)))
     # Work based on if argument is file or folder, folder is slower.
     if os.path.isfile(args.fullpath) and args.fullpath.endswith(".css"):
@@ -1217,13 +1190,11 @@ def main():
     else:
         log.critical("File or folder not found,or cant be read,or I/O Error.")
         sys.exit(1)
-    if args.after and len(args.after) and not getoutput:
-        log.critical("Feature only available on Python 3.x, command ignored.")
-    if args.after and len(args.after) and getoutput:
+    if only_on_py3((args.after, getoutput)):
         log.info(getoutput(str(args.after)))
     log.info('-' * 80)
     log.info('Files Processed: {}.'.format(list_of_files))
-    log.info('Number of Files Processed: {}'.format(
+    log.info('Number of Files Processed: {}.'.format(
         len(list_of_files) if isinstance(list_of_files, tuple) else 1))
     log.info('Total Maximum RAM Memory used: ~{} MegaBytes.'.format(int(
         resource.getrusage(resource.RUSAGE_SELF).ru_maxrss *
