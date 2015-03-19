@@ -101,6 +101,10 @@ sudo chmod +x /usr/bin/css-html-js-minify
 css-html-js-minify
 ```
 
+**MANUALLY:**
+
+- Save [this file](https://raw.githubusercontent.com/juancarlospaco/css-html-js-minify/master/css-html-js-minify.py) and run it with Python.
+
 
 # Why?:
 
@@ -154,6 +158,19 @@ css-html-js-minify
 ```
 
 
+# Migration:
+
+- Too keep things simple [KISS](http://en.wikipedia.org/wiki/KISS_principle), the human readable indented commented hackable HTML is keep as `*.htm` and the Compressed Production-ready as `*.html`. This is inspired from JavaScript/CSS `*.min.js` and `*.min.css`.
+
+To Migrate from tipical file extension HTML to HTM, which is the exactly same, you can run this:
+
+```shell
+find . -name "*.html" -exec rename "s/.html/.htm/" "{}" \;
+```
+
+This will make a copy of all `*.html` renaming them as `*.htm` recursively from the current folder. Nothing deleted.
+
+
 # Requisites:
 
 - [Python 3.x](https://www.python.org "Python Homepage") *(or Python 2.x, or PyPy 2.x, or PyPy 3.x)*
@@ -161,7 +178,8 @@ css-html-js-minify
 
 # Coding Style Guide:
 
-- Lint, PEP-8, PEP-257, PyLama, iSort must Pass Ok. `pip install pep8 pep257 pylama isort`
+- Lint, [PEP-8](https://www.python.org/dev/peps/pep-0008), [PEP-257](https://www.python.org/dev/peps/pep-0257), [PyLama](https://github.com/klen/pylama#-pylama), [iSort](https://github.com/timothycrosley/isort) must Pass Ok. `pip install pep8 pep257 pylama isort`
+- If theres any kind of Tests, they must Pass Ok, if theres no Tests, its ok, if Tests provided, is even better.
 
 
 # Contributors:
