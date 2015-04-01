@@ -37,7 +37,7 @@ except ImportError:
     from io import StringIO  # lint:ok
 
 
-__version__ = "1.0.11"
+__version__ = "1.0.12"
 __license__ = "GPLv3+ LGPLv3+"
 __author__ = "Juan Carlos"
 __email__ = "juancarlospaco@gmail.com"
@@ -877,7 +877,7 @@ class JavascriptMinify(object):
 def walkdir_to_filelist(where, target, omit):
     """Perform full walk of where, gather full path of all files."""
     log.debug("""Recursively Scanning {}, searching for {}, and ignoring {}.
-    """.format(where, target.upper(), omit.upper()))
+    """.format(where, target, omit))
     return tuple([os.path.join(root, f) for root, d, files in os.walk(where)
                   for f in files if not f.startswith('.')  # ignore hidden
                   and not f.endswith(omit)  # not process processed file

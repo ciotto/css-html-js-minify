@@ -4,7 +4,7 @@
 # To Upload to PyPI by executing:  python3 setup.py sdist upload -r pypi
 
 
-"""Setup.py for Python Wheels, as Generic as possible."""
+"""Setup.py for Python, as Generic as possible."""
 
 
 import os
@@ -49,9 +49,6 @@ setup(
     requires=['pip'],
 
     scripts=["css-html-js-minify.py"],
-    entry_points = {
-        'console_scripts': ['css-html-js-minify = css_html_js_minify']
-    },
 
     keywords=['CSS', 'HTML', 'JS', 'Compressor', 'CSS3', 'HTML5', 'Web',
               'Javascript', 'Minifier', 'Minify', 'Uglify', 'Obfuscator',
