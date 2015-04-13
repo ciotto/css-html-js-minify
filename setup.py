@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# To Upload to PyPI by executing:  python3 setup.py sdist upload -r pypi
+# To Upload to PyPI by executing:
+# chrt --verbose --idle 0 python3 setup.py
+# bdist_egg sdist --formats=bztar,gztar,zip upload --show-response --sign
 
 
 """Setup.py for Python, as Generic as possible."""
