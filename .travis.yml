@@ -8,6 +8,7 @@ python:
     - "3.4"
     - "pypy"
     - "pypy3"
+    - "nightly"
 
 
 os:
