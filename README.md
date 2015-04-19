@@ -173,7 +173,7 @@ This will make a copy of all `*.html` renaming them as `*.htm` recursively from 
 
 # Requisites:
 
-- [Python 3.x](https://www.python.org "Python Homepage") *(or Python 2.x, or PyPy 2.x, or PyPy 3.x)*
+- [Python 3.x](https://www.python.org "Python Homepage") *(or Python 2.x, or PyPy 2.x, or PyPy 3.x, or Python Nightly)*
 
 
 # Coding Style Guide:
