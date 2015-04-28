@@ -1,9 +1,28 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
+#
+# To generate DEB package from Python Package:
+# sudo pip3 install stdeb
+# python3 setup.py --verbose --command-packages=stdeb.command bdist_deb
+#
+#
+# To generate RPM package from Python Package:
+# sudo apt-get install rpm
+# python3 setup.py bdist_rpm --verbose --fix-python --binary-only
+#
+#
+# To generate EXE MS Windows from Python Package:
+# python3 setup.py bdist_wininst --verbose
+#
+#
+# To generate PKGBUILD ArchLinux from Python Package:
+# sudo pip3 install git+https://github.com/bluepeppers/pip2arch.git
+# pip2arch PackageNameHere
+#
+#
 # To Upload to PyPI by executing:
-# chrt --verbose --idle 0 python3 setup.py
-# bdist_egg sdist --formats=bztar,gztar,zip upload --show-response --sign
+# python3 setup.py bdist_egg sdist --formats=bztar,gztar,zip upload --sign
 
 
 """Setup.py for Python, as Generic as possible."""
