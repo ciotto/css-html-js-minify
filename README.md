@@ -7,7 +7,7 @@
 - **StandAlone Async single-file cross-platform no-dependencies Unicode-ready Python3-ready Minifier for the Web.**
 
 
-```bash
+```shell
 css-html-js-minify.py --help
 
 usage: css-html-js-minify.py [-h] [--version] [--wrap] [--prefix PREFIX]
@@ -69,6 +69,12 @@ Watch works for whole Folders, with minimum of ~60 Secs between runs.
 
 ![screenshot](https://raw.githubusercontent.com/juancarlospaco/css-html-js-minify/master/linux-css-html-js-compressor.jpg "Linux 32bit/64bit Python2/Python3")
 
+**Apple Mac Os X:**
+
+![screenshot](https://raw.githubusercontent.com/juancarlospaco/css-html-js-minify/master/osx-css-html-js-compressor_terminal.jpg "Apple Mac Os X Terminal by Loggerhead")
+
+![screenshot](https://raw.githubusercontent.com/juancarlospaco/css-html-js-minify/master/osx-css-html-js-compressor_iterm2.jpg "Apple Mac Os X iTerm2 by Loggerhead")
+
 **MS Windows:**
 
 ![screenshot](https://raw.githubusercontent.com/juancarlospaco/css-html-js-minify/master/windows-css-html-js-compressor.jpg "MS Windows 32bit/64bit Python2/Python3")
@@ -89,9 +95,14 @@ css-html-js-minify.py /project/static/
 
 # Install permanently on the system:
 
-**PIP:**
+**PIP:** *(Recommended!)*
 ```
 sudo pip3 install css-html-js-minify
+```
+
+**PIP desde Git:**
+```
+sudo pip3 install git+https://raw.githubusercontent.com/juancarlospaco/css-html-js-minify/master/css-html-js-minify.py
 ```
 
 **WGET:**
@@ -190,7 +201,7 @@ This will make a copy of all `*.html` renaming them as `*.htm` recursively from 
 
 # Licence:
 
-- GNU GPL Latest Version *AND* GNU LGPL Latest Version *AND* any Licence YOU Request via Bug Report.
+- GNU GPL Latest Version *AND* GNU LGPL Latest Version *AND* any Licence [YOU Request via Bug Report](https://github.com/juancarlospaco/css-html-js-minify/issues/new).
 
 
 Donate, Charityware :
