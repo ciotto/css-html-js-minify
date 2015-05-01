@@ -982,7 +982,7 @@ def process_single_html_file(html_file_path):
         with open(html_file_path) as html_file:
             minified_html = html_minify(html_file.read(),
                                         comments=only_on_py3(args.comments))
-    html_file_path = prefixer_extensioner(html_file_path, ".htm", ".html")
+    html_file_path = prefixer_extensioner(html_file_path, ".html", ".html")
     try:  # Python3
         with open(html_file_path, "w", encoding="utf-8") as output_file:
             output_file.write(minified_html)
