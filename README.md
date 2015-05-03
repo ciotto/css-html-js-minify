@@ -70,7 +70,7 @@ Watch works for whole Folders, with minimum of ~60 Secs between runs.
 ![screenshot](https://raw.githubusercontent.com/juancarlospaco/css-html-js-minify/master/linux-css-html-js-compressor.jpg "Linux 32bit/64bit Python2/Python3")
 
 **Apple Mac Os X:**
-
+[ <sup>*(Provided by Loggerhead)*</sup> ](https://github.com/juancarlospaco/css-html-js-minify/issues/7#issuecomment-97280835)
 ![screenshot](https://raw.githubusercontent.com/juancarlospaco/css-html-js-minify/master/osx-css-html-js-compressor_terminal.jpg "Apple Mac Os X Terminal by Loggerhead")
 
 ![screenshot](https://raw.githubusercontent.com/juancarlospaco/css-html-js-minify/master/osx-css-html-js-compressor_iterm2.jpg "Apple Mac Os X iTerm2 by Loggerhead")
