@@ -22,22 +22,24 @@ from datetime import datetime
 from doctest import testmod
 from hashlib import sha1
 from multiprocessing import cpu_count, Pool
+from shutil import disk_usage
 from tempfile import gettempdir
 from time import sleep
 
 try:
     from urllib import request
     from subprocess import getoutput
+    from io import StringIO  # pure-Python StringIO supports unicode.
+except ImportError:
+    request = getoutput = None
+    from StringIO import StringIO  # lint:ok
+try:
     import resource  # windows dont have resource
 except ImportError:
-    request = getoutput = resource = None
-try:
-    from StringIO import StringIO  # pure-Python StringIO supports unicode.
-except ImportError:
-    from io import StringIO  # lint:ok
+    resource = None
 
 
-__version__ = "1.0.13"
+__version__ = "1.0.14"
 __license__ = "GPLv3+ LGPLv3+"
 __author__ = "Juan Carlos"
 __email__ = "juancarlospaco@gmail.com"
@@ -897,6 +899,7 @@ def process_multiple_files(file_path):
             else:
                 previous = actual
                 log.debug("Modification detected on {}.".format(file_path))
+                check_working_folder(os.path.dirname(file_path))
                 if file_path.endswith(".css"):
                     process_single_css_file(file_path)
                 elif file_path.endswith(".js"):
@@ -943,6 +946,7 @@ def process_single_css_file(css_file_path):
     except:  # Python2
         with open(css_file_path) as css_file:
             original_css = css_file.read()
+    log.debug("INPUT: Reading CSS file {}.".format(css_file_path))
     minified_css = css_minify(original_css,
                               wrap=args.wrap, comments=args.comments)
     if args.timestamp:
@@ -955,20 +959,20 @@ def process_single_css_file(css_file_path):
         gz_file_path = prefixer_extensioner(
             css_file_path, ".css",
             ".css.gz" if args.overwrite else ".min.css.gz", original_css)
+        log.debug("OUTPUT: Writing gZIP CSS Minified {}.".format(gz_file_path))
     try:
         with open(min_css_file_path, "w", encoding="utf-8") as output_file:
             output_file.write(minified_css)
         if only_on_py3(args.gzip):
             with gzip.open(gz_file_path, "wt", encoding="utf-8") as output_gz:
                 output_gz.write(minified_css)
-            log.debug("Saving GZIPed Minified file {}.".format(gz_file_path))
     except:
         with open(min_css_file_path, "w") as output_file:
             output_file.write(minified_css)
         if only_on_py3(args.gzip):
             with gzip.open(gz_file_path, "w") as output_gz:
                 output_gz.write(minified_css)
-            log.debug("Saving GZIPed Minified file {}.".format(gz_file_path))
+    log.debug("OUTPUT: Writing CSS Minified {}.".format(min_css_file_path))
 
 
 def process_single_html_file(html_file_path):
@@ -982,13 +986,16 @@ def process_single_html_file(html_file_path):
         with open(html_file_path) as html_file:
             minified_html = html_minify(html_file.read(),
                                         comments=only_on_py3(args.comments))
-    html_file_path = prefixer_extensioner(html_file_path, ".html", ".html")
+    log.debug("INPUT: Reading HTML file {}.".format(html_file_path))
+    html_file_path = prefixer_extensioner(
+        html_file_path, ".html" if args.overwrite else ".htm", ".html")
     try:  # Python3
         with open(html_file_path, "w", encoding="utf-8") as output_file:
             output_file.write(minified_html)
     except:  # Python2
         with open(html_file_path, "w") as output_file:
             output_file.write(minified_html)
+    log.debug("OUTPUT: Writing HTML Minified {}.".format(html_file_path))
 
 
 def process_single_js_file(js_file_path):
@@ -1000,6 +1007,7 @@ def process_single_js_file(js_file_path):
     except:  # Python2
         with open(js_file_path) as js_file:
             original_js = js_file.read()
+    log.debug("INPUT: Reading JS file {}.".format(js_file_path))
     if args.obfuscate:  # with obfuscation
         minified_js = simple_replacer_js(js_minify(js_minify2(original_js)))
     else:  # without obfuscation
@@ -1014,20 +1022,20 @@ def process_single_js_file(js_file_path):
         gz_file_path = prefixer_extensioner(
             js_file_path, ".js", ".js.gz" if args.overwrite else ".min.js.gz",
             original_js)
+        log.debug("OUTPUT: Writing gZIP JS Minified {}.".format(gz_file_path))
     try:  # Python3
         with open(min_js_file_path, "w", encoding="utf-8") as output_file:
             output_file.write(minified_js)
         if only_on_py3(args.gzip):
             with gzip.open(gz_file_path, "wt", encoding="utf-8") as output_gz:
                 output_gz.write(minified_js)
-            log.debug("Saving GZIPed Minified file {}.".format(gz_file_path))
     except:  # Python2
         with open(min_js_file_path, "w") as output_file:
             output_file.write(minified_js)
         if only_on_py3(args.gzip):
             with gzip.open(gz_file_path, "w") as output_gz:
                 output_gz.write(minified_js)
-            log.debug("Saving GZIPed Minified file {}.".format(gz_file_path))
+    log.debug("OUTPUT: Writing JS Minified {}.".format(min_js_file_path))
 
 
 def check_for_updates():
@@ -1052,6 +1060,25 @@ def only_on_py3(boolean_argument=True):
         log.critical("Feature only available on Python 3, feature ignored !.")
         log.debug("Please Migrate to Python 3 for better User Experience...")
         return False
+
+
+def check_working_folder(folder_to_check):
+    """Check destination folder."""
+    log.debug("Checking the Working Folder: {}.".format(folder_to_check))
+    # What if folder is not a folder.
+    if not os.path.isdir(folder_to_check):
+        log.critical("Folder {} does not exist !.".format(folder_to_check))
+    # What if destination folder is not Readable by the user.
+    elif not os.access(folder_to_check, os.R_OK):
+        log.critical("Folder {} not Readable !.".format(folder_to_check))
+    # What if destination folder is not Writable by the user.
+    elif not os.access(folder_to_check, os.W_OK):
+        log.critical("Folder {} Not Writable !.".format(folder_to_check))
+    hdd = int(disk_usage(folder_to_check).free / 1024 / 1024 / 1024)
+    if hdd:  # > 1 Gb
+        log.info("Total Free Space: ~{} GigaBytes.".format(hdd))
+    else:  # < 1 Gb
+        log.critical("Total Free Space is < 1 GigaByte; Epic Fail !.")
 
 
 def make_arguments_parser():
@@ -1162,14 +1189,15 @@ def main():
     log.info(__doc__ + __version__)
     if only_on_py3((args.before, getoutput)):
         log.info(getoutput(str(args.before)))
+    check_working_folder(os.path.dirname(args.fullpath))
     # Work based on if argument is file or folder, folder is slower.
     if os.path.isfile(args.fullpath) and args.fullpath.endswith(".css"):
         log.info("Target is a CSS File.")
         list_of_files = str(args.fullpath)
         process_single_css_file(args.fullpath)
-    elif os.path.isfile(args.fullpath
-                        ) and args.fullpath.endswith((".htm", ".html")):
-        log.info("Target is a HTML File.")
+    elif os.path.isfile(args.fullpath) and args.fullpath.endswith(
+        ".html" if args.overwrite else ".htm"):
+        log.info("Target is HTM{} File.".format("L" if args.overwrite else ""))
         list_of_files = str(args.fullpath)
         process_single_html_file(args.fullpath)
     elif os.path.isfile(args.fullpath) and args.fullpath.endswith(".js"):
@@ -1177,12 +1205,14 @@ def main():
         list_of_files = str(args.fullpath)
         process_single_js_file(args.fullpath)
     elif os.path.isdir(args.fullpath):
-        log.info("Target is a Folder with CSS, HTML, JS.")
+        log.info("Target is a Folder with CSS, HTM{}, JS files !.".format(
+            "L" if args.overwrite else ""))
         log.warning("Processing a whole Folder may take some time...")
         list_of_files = walkdir_to_filelist(
             args.fullpath,
             (".css", ".js", ".html" if args.overwrite else ".htm"),
-            tuple() if args.overwrite else (".min.css", ".min.js", ".htm"))
+            (".min.css", ".min.js", ".htm" if args.overwrite else ".html"))
+        log.info('Total Maximum CPUs used: ~{} Cores.'.format(cpu_count()))
         pool = Pool(cpu_count())  # Multiprocessing Async
         pool.map_async(process_multiple_files, list_of_files)
         pool.close()
