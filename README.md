@@ -195,6 +195,11 @@ This will make a copy of all `*.html` renaming them as `*.htm` recursively from 
 
 # Contributors:
 
+| **Hall of Fame** |
+| -------------------------------- |
+| [![](https://avatars1.githubusercontent.com/u/1189414?s=50)](https://github.com/juancarlospaco) [![](https://avatars2.githubusercontent.com/u/3127847?s=50)](https://github.com/cassiobotaro) [![](https://avatars1.githubusercontent.com/u/5056390?s=50)](https://github.com/loggerhead) [![](https://avatars3.githubusercontent.com/u/7449642?s=50)](https://github.com/skolsuper) [![](https://avatars0.githubusercontent.com/u/4732915?s=50)](https://github.com/cuducos) [![](https://avatars1.githubusercontent.com/u/517395?s=50)](https://github.com/lowks) [![](https://avatars3.githubusercontent.com/u/6242660?s=50)](https://github.com/alanvinals) [![](https://avatars2.githubusercontent.com/u/1552641?s=50)](https://github.com/JayXon) [![](https://avatars1.githubusercontent.com/u/6053065?s=50)](https://github.com/rokarc) |
+
+
 - **Please Star this Repo on Github !**, it helps to show up faster on searchs.
 - **Ad-Hocracy Meritocracy**: 3 Pull Requests Merged on Master you become Repo Admin. *Join us!*
 - [Help](https://help.github.com/articles/using-pull-requests) and more [Help](https://help.github.com/articles/fork-a-repo) and Interactive Quick [Git Tutorial](https://try.github.io).
