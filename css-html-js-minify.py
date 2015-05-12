@@ -22,16 +22,16 @@ from datetime import datetime
 from doctest import testmod
 from hashlib import sha1
 from multiprocessing import cpu_count, Pool
-from shutil import disk_usage
 from tempfile import gettempdir
 from time import sleep
 
 try:
     from urllib import request
     from subprocess import getoutput
+    from shutil import disk_usage
     from io import StringIO  # pure-Python StringIO supports unicode.
 except ImportError:
-    request = getoutput = None
+    request = getoutput = disk_usage = None
     from StringIO import StringIO  # lint:ok
 try:
     import resource  # windows dont have resource
@@ -1074,11 +1074,12 @@ def check_working_folder(folder_to_check):
     # What if destination folder is not Writable by the user.
     elif not os.access(folder_to_check, os.W_OK):
         log.critical("Folder {} Not Writable !.".format(folder_to_check))
-    hdd = int(disk_usage(folder_to_check).free / 1024 / 1024 / 1024)
-    if hdd:  # > 1 Gb
-        log.info("Total Free Space: ~{} GigaBytes.".format(hdd))
-    else:  # < 1 Gb
-        log.critical("Total Free Space is < 1 GigaByte; Epic Fail !.")
+    if disk_usage:
+        hdd = int(disk_usage(folder_to_check).free / 1024 / 1024 / 1024)
+        if hdd:  # > 1 Gb
+            log.info("Total Free Space: ~{} GigaBytes.".format(hdd))
+        else:  # < 1 Gb
+            log.critical("Total Free Space is < 1 GigaByte; Epic Fail !.")
 
 
 def make_arguments_parser():
