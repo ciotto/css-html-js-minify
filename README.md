@@ -100,7 +100,7 @@ css-html-js-minify.py /project/static/
 sudo pip3 install css-html-js-minify
 ```
 
-**PIP desde Git:**
+**PIP from Git:**
 ```
 sudo pip3 install git+https://raw.githubusercontent.com/juancarlospaco/css-html-js-minify/master/css-html-js-minify.py
 ```
